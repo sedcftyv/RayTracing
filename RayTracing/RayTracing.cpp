@@ -230,7 +230,6 @@ int main()
 			write_color(fout, pixel_color, samples_per_pixel);
 		}
 	}
-	
 	fout.close();
 	std::cerr << "\nDone.\n";
 }
