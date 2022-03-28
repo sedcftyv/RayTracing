@@ -1,0 +1,81 @@
+#pragma once
+
+#ifndef INTERACTION_H
+#define INTERACTION_H
+
+#include "pbrt.h"
+#include "geometry.h"
+#include "transform.h"
+
+
+struct Interaction {
+	Interaction() :time(0) { }
+	Interaction(const Vector3f &p, const Normal3f &n,const Vector3f &wo, Float time)
+		: p(p), time(time), wo(wo), n(n) { }
+	bool IsSurfaceInteraction() const {
+		return n != Normal3f();
+	}
+	//Ray SpawnRay(const Vector3f &d) const {
+	//	Vector3f o = OffsetRayOrigin(p, pError, n, d);
+	//	return Ray(o, d, Infinity, time);
+	//}
+	//Ray SpawnRayTo(const Vector3f &p2) const {
+	//	Vector3f origin = OffsetRayOrigin(p, pError, n, p2 - p);
+	//	Vector3f d = p2 - origin;
+	//	return Ray(origin, d, 1 - ShadowEpsilon, time );
+	//}
+	//Ray SpawnRayTo(const Interaction &it) const {
+	//	Vector3f origin = OffsetRayOrigin(p, pError, n, it.p - p);
+	//	Vector3f target = OffsetRayOrigin(it.p, it.pError, it.n, origin - it.p);
+	//	Vector3f d = target - origin;
+	//	return Ray(origin, d, 1 - ShadowEpsilon, time);
+	//}
+	//Interaction(const Vector3f &p, const Vector3f &wo, Float time,
+	//	const MediumInterface &mediumInterface)
+	//	: p(p), time(time), wo(wo){ }
+	//Interaction(const Vector3f &p, Float time)
+	//	: p(p), time(time){ }
+	//bool IsMediumInteraction() const { return !IsSurfaceInteraction(); }
+
+	//<< Interaction Public Data >>
+	Vector3f p;
+	Float time;
+	//Vector3f pError;
+	Vector3f wo;
+	Normal3f n;
+	//MediumInterface mediumInterface;
+};
+
+class SurfaceInteraction : public Interaction {
+public:
+	SurfaceInteraction() { }
+	//SurfaceInteraction(const Vector3f &p, const Vector3f &pError, const Point2f &uv,
+	//	const Vector3f &wo, const Vector3f &dpdu, const Vector3f &dpdv,
+	//	const Normal3f &dndu, const Normal3f &dndv,
+	//	Float time, const Shape *sh);
+	//void SetShadingGeometry(const Vector3f &dpdu, const Vector3f &dpdv,
+	//	const Normal3f &dndu, const Normal3f &dndv, bool orientationIsAuthoritative);
+	//void ComputeScatteringFunctions(const RayDifferential &ray,MemoryArena &arena, bool allowMultipleLobes = false);
+	void ComputeScatteringFunctions();
+	//void ComputeDifferentials(const RayDifferential &r) const;
+	//Spectrum Le(const Vector3f &w) const;
+
+	//Point2f uv;
+	//Vector3f dpdu, dpdv;
+	//Normal3f dndu, dndv;
+	const Shape *shape = nullptr;
+	//struct {
+	//	Normal3f n;
+	//	Vector3f dpdu, dpdv;
+	//	Normal3f dndu, dndv;
+	//} shading;
+	const Primitive *primitive = nullptr;
+	//BSDF *bsdf = nullptr;
+	//BSSRDF *bssrdf = nullptr;
+	//mutable Vector3f dpdx, dpdy;
+	//mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
+
+};
+
+
+#endif

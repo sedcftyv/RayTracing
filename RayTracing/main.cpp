@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 #include "rtweekend.h"
 //#include "color.h"
@@ -110,9 +110,7 @@ int main()
 	Transform tri_Object2World, tri_World2Object;
 	std::vector<Point3f>p;
 	std::vector<int>vi;
-	string path("C:\\VS\\5_ARAP\\project\\bin\\Balls.obj");
-	objload(path, p, vi);
-	int nTriangles = vi.size() / 3;
+	int nTriangles = int(vi.size()) / 3;
 	int nVertices = p.size();
 	int *vertexIndices = new int[nTriangles * 3];
 	int tmp = p.size();
@@ -121,47 +119,10 @@ int main()
 		vertexIndices[i] = vi[i];
 	for (int j = 0; j < nVertices; ++j)
 		P[j] = p[j];
-	std::vector<std::shared_ptr<Shape>> tris = CreateTriangleMesh(&tri_Object2World, &tri_World2Object, false, nTriangles, vertexIndices, nVertices, P, nullptr, nullptr, nullptr, nullptr);
+	std::vector<std::shared_ptr<Shape>> tris = CreateTriangleMesh(&tri_Object2World, &tri_World2Object,false,nTriangles,vertexIndices,nVertices,P,nullptr,nullptr,nullptr,nullptr);
 	std::vector<std::shared_ptr<Primitive>> prims;
 	for (int i = 0; i < nTriangles; ++i)
 		prims.push_back(make_shared<GeometricPrimitive>(tris[i]));
 	Aggregate *agg;
 	agg = new BVHAccel(prims);
-	
-	Camera* cam;
-	Point3f eye(0.f, 0.f, -20.f), look(0.0, 0.0, 0.0f);
-	Vector3f up(0.0f, 1.0f, 0.0f);
-	Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
-	Transform Camera2World = Inverse(lookat);
-	cam = CreatePerspectiveCamera(Camera2World);
-	Vector3f Light(1.0, 1.0, 1.0);
-	for (int j = 0; j < image_height; j++) {
-		for (int i = 0; i < image_width; i++) {
-			//float v = float(i + 0.5) / float(image_height); //random ( )
-			//float u = float(j + 0.5) / float(image_width); // 0.5
-			//cout << (lower_left_corner + u * horizontal + v * vertical) << endl;
-			//Ray r(Vector3f(origin), (lower_left_corner + u * horizontal + v* vertical) - Vector3f(origin));
-			Ray r;
-			CameraSample cs; 
-			cs.pFilm = Point2f(i + random_double(), j + random_double());
-			cam->GenerateRay(cs, &r);
-
-			float tHit;
-			SurfaceInteraction  isect;
-			Spectrum colObj(0.0);
-			//colObj[0] = 1.0f;
-			//colObj[1] = 1.0f;
-		
-			if(agg->Intersect(r, &isect))
-			{
-				float Li = Dot(Light, isect.n);
-				colObj[1] = std::abs(Li);
-				//cout << r.d[1] << endl;
-			}
-			write_color(fout, colObj, 1);
-		}
-	}
-
-	fout.close();
-	std::cerr << "\nDone.\n";
 }

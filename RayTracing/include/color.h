@@ -3,13 +3,14 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "vec3.h"
+//#include "Vec3.h"
+#include "core/geometry.h"
 #include <iostream>
 
 void write_color(std::ostream &out, color pixel_color, int samples_per_pixel) {
-	auto r = pixel_color.x();
-	auto g = pixel_color.y();
-	auto b = pixel_color.z();
+	auto r = pixel_color.x;
+	auto g = pixel_color.y;
+	auto b = pixel_color.z;
 
 	if (r != r) r = 0.0;
 	if (g != g) g = 0.0;

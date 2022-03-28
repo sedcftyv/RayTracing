@@ -2,7 +2,8 @@
 #ifndef PDF_H
 #define PDF_H
 
-#include "vec3.h"
+//#include "Vec3.h"
+#include "core/geometry.h"
 #include "rtweekend.h"
 #include "onb.h"
 
@@ -10,20 +11,20 @@ class pdf {
 public:
 	virtual ~pdf() {}
 
-	virtual double value(const vec3& direction) const = 0;
-	virtual vec3 generate() const = 0;
+	virtual double value(const Vector3f& direction) const = 0;
+	virtual Vector3f generate() const = 0;
 };
 
 class cosine_pdf : public pdf {
 public:
-	cosine_pdf(const vec3& w) { uvw.build_from_w(w); }
+	cosine_pdf(const Vector3f& w) { uvw.build_from_w(w); }
 
-	virtual double value(const vec3& direction) const override {
-		auto cosine = dot(unit_vector(direction), uvw.w());
+	virtual double value(const Vector3f& direction) const override {
+		auto cosine = Dot(Normalize(direction), uvw.w());
 		return (cosine <= 0) ? 0 : cosine / pi;
 	}
 
-	virtual vec3 generate() const override {
+	virtual Vector3f generate() const override {
 		return uvw.local(random_cosine_direction());
 	}
 
@@ -33,18 +34,18 @@ public:
 
 class hittable_pdf : public pdf {
 public:
-	hittable_pdf(shared_ptr<hittable> p, const point3& origin) : ptr(p), o(origin) {}
+	hittable_pdf(shared_ptr<hittable> p, const Vector3f& origin) : ptr(p), o(origin) {}
 
-	virtual double value(const vec3& direction) const override {
+	virtual double value(const Vector3f& direction) const override {
 		return ptr->pdf_value(o, direction);
 	}
 
-	virtual vec3 generate() const override {
+	virtual Vector3f generate() const override {
 		return ptr->random(o);
 	}
 
 public:
-	point3 o;
+	Vector3f o;
 	shared_ptr<hittable> ptr;
 };
 
@@ -55,11 +56,11 @@ public:
 		p[1] = p1;
 	}
 
-	virtual double value(const vec3& direction) const override {
+	virtual double value(const Vector3f& direction) const override {
 		return 0.5 * p[0]->value(direction) + 0.5 *p[1]->value(direction);
 	}
 
-	virtual vec3 generate() const override {
+	virtual Vector3f generate() const override {
 		if (random_double() < 0.5)
 			return p[0]->generate();
 		else
