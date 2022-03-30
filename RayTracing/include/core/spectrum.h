@@ -163,7 +163,7 @@ public:
 	CoefficientSpectrum Clamp(Float low = 0, Float high = Infinity) const {
 		CoefficientSpectrum ret;
 		for (int i = 0; i < nSpectrumSamples; ++i)
-			ret.c[i] = pbrt::Clamp(c[i], low, high);
+			ret.c[i] = ::Clamp(c[i], low, high);
 		DCHECK(!ret.HasNaNs());
 		return ret;
 	}
@@ -224,6 +224,11 @@ class RGBSpectrum : public CoefficientSpectrum<3> {
 public:
 	// RGBSpectrum Public Methods
 	RGBSpectrum(Float v = 0.f) : CoefficientSpectrum<3>(v) {}
+	RGBSpectrum(Float a, Float b, Float c) {
+		this->c[0] = a;
+		this->c[1] = b;
+		this->c[2] = c;
+	}
 	RGBSpectrum(const CoefficientSpectrum<3> &v) : CoefficientSpectrum<3>(v) {}
 	RGBSpectrum(const RGBSpectrum &s,
 		SpectrumType type = SpectrumType::Reflectance) {

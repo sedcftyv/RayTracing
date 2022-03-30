@@ -5,6 +5,7 @@
 
 #include "pbrt.h"
 #include "geometry.h"
+#include "rng.h"
 
 void StratifiedSample1D(Float *samples, int nsamples, RNG &rng,
 	bool jitter = true);
@@ -132,17 +133,6 @@ inline Float PowerHeuristic(int nf, Float fPdf, int ng, Float gPdf) {
 	Float f = nf * fPdf, g = ng * gPdf;
 	return (f * f) / (f * f + g * g);
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

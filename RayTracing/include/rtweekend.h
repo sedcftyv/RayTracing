@@ -47,7 +47,7 @@ inline int random_int(int min, int max) {
 
 // Common Headers
 
-#include "ray.h"
+//#include "ray.h"
 #include "core/geometry.h"
 
 inline Vector3f random_cosine_direction() {

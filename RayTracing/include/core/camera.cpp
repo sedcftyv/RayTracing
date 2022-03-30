@@ -57,7 +57,7 @@ Float PerspectiveCamera::GenerateRay(const CameraSample &sample,Ray *ray) const 
 	// Compute raster and camera sample positions
 	Point3f pFilm = Point3f(sample.pFilm.x, sample.pFilm.y, 0);
 	Point3f pCamera = RasterToCamera(pFilm);
-	*ray = Ray(Vector3f(Point3f(0, 0, -20)), Normalize(Vector3f(pCamera)));
+	*ray = Ray(Vector3f(Point3f(0, 0, 0)), Normalize(Vector3f(pCamera)));
 	*ray = CameraToWorld(*ray);
 	return 1;
 }

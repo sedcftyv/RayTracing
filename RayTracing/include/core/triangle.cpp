@@ -143,13 +143,21 @@ bool Triangle::Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
 	Float b2 = e2 * invDet;
 	Float t = tScaled * invDet;
 
-	*isect = SurfaceInteraction();
+	Vector3f dpdu, dpdv;
+	Point2f uv[3];
+	GetUVs(uv);
+
+	Vector2f duv02 = uv[0] - uv[2], duv12 = uv[1] - uv[2];
+	Vector3f dp02 = p0 - p2, dp12 = p1 - p2;
+	Point2f uvHit = b0 * uv[0] + b1 * uv[1] + b2 * uv[2];
+	Point3f pHit = b0 * p0 + b1 * p1 + b2 * p2;
+
+
+	*isect = SurfaceInteraction(pHit,uvHit,-ray.d,dpdu,dpdv,Normal3f(0,0,0),Normal3f(0,0,0),ray.time,this,faceIndex);
 
 	// Override surface normal in _isect_ for triangle
-	Vector3f dp02=p0-p2;
-	Vector3f dp12=p1-p2;
-	isect->n = Normal3f(Normalize(Cross(dp02, dp12)));
-
+	isect->n = isect->shading.n = Normal3f(Normalize(Cross(dp02, dp12)));
+	isect->p = Vector3f(b0 * p0 + b1 * p1 + b2 * p2);
 
 	*tHit = t;
 	++nHits;

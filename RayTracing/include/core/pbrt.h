@@ -13,12 +13,16 @@
 #include <vector>
 #include <assert.h>
 
+
 #define CHECK_NE(a)
 #define CHECK_EQ(a)
 #define CHECK_GE(a)
 #define CHECK_LT(a)
 #define DCHECK(a)
+#define DCHECK_NE(a)
 #define CHECK(a)
+#define CHECK_GT(a)
+
 
 #define PBRT_CONSTEXPR constexpr
 #ifdef PBRT_FLOAT_AS_DOUBLE
@@ -50,12 +54,15 @@ class Primitive;
 class GeometricPrimitive;
 class TransformedPrimitive;
 class MediumInterface;
+class BxDF;
 class BSDF;
-class BSSRDF;
-class MemoryArena;
+//class BSSRDF;
+//class MemoryArena;
 class RGBSpectrum;
-class TransportMode;
-typedef RGBSpectrum Spectrum;
+template <typename T>
+class Texture;
+class Material;
+typedef RGBSpectrum Spectrum;
 
 
 
@@ -153,5 +160,8 @@ inline void FreeAligned(void *ptr) {
 	free(ptr);
 #endif
 }
+
+inline Float Lerp(Float t, Float v1, Float v2) 
+{ return (1 - t) * v1 + t * v2; }
 
 #endif

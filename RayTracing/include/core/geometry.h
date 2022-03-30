@@ -15,6 +15,107 @@ inline bool isNaN(const int x) {
 }
 
 //class Medium;
+template <typename T>
+class Vector2 {
+public:
+	// Vector2 Public Methods
+	Vector2() { x = y = 0; }
+	Vector2(T xx, T yy) : x(xx), y(yy) { DCHECK(!HasNaNs()); }
+	bool HasNaNs() const { return isNaN(x) || isNaN(y); }
+	explicit Vector2(const Point2<T> &p);
+	explicit Vector2(const Point3<T> &p);
+#ifndef NDEBUG
+	// The default versions of these are fine for release builds; for debug
+	// we define them so that we can add the Assert checks.
+	Vector2(const Vector2<T> &v) {
+		DCHECK(!v.HasNaNs());
+		x = v.x;
+		y = v.y;
+	}
+	Vector2<T> &operator=(const Vector2<T> &v) {
+		DCHECK(!v.HasNaNs());
+		x = v.x;
+		y = v.y;
+		return *this;
+	}
+#endif  // !NDEBUG
+
+	Vector2<T> operator+(const Vector2<T> &v) const {
+		DCHECK(!v.HasNaNs());
+		return Vector2(x + v.x, y + v.y);
+	}
+
+	Vector2<T> &operator+=(const Vector2<T> &v) {
+		DCHECK(!v.HasNaNs());
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+	Vector2<T> operator-(const Vector2<T> &v) const {
+		DCHECK(!v.HasNaNs());
+		return Vector2(x - v.x, y - v.y);
+	}
+
+	Vector2<T> &operator-=(const Vector2<T> &v) {
+		DCHECK(!v.HasNaNs());
+		x -= v.x;
+		y -= v.y;
+		return *this;
+	}
+	bool operator==(const Vector2<T> &v) const { return x == v.x && y == v.y; }
+	bool operator!=(const Vector2<T> &v) const { return x != v.x || y != v.y; }
+	template <typename U>
+	Vector2<T> operator*(U f) const {
+		return Vector2<T>(f * x, f * y);
+	}
+
+	template <typename U>
+	Vector2<T> &operator*=(U f) {
+		DCHECK(!isNaN(f));
+		x *= f;
+		y *= f;
+		return *this;
+	}
+	template <typename U>
+	Vector2<T> operator/(U f) const {
+		CHECK_NE(f, 0);
+		Float inv = (Float)1 / f;
+		return Vector2<T>(x * inv, y * inv);
+	}
+
+	template <typename U>
+	Vector2<T> &operator/=(U f) {
+		CHECK_NE(f, 0);
+		Float inv = (Float)1 / f;
+		x *= inv;
+		y *= inv;
+		return *this;
+	}
+	Vector2<T> operator-() const { return Vector2<T>(-x, -y); }
+	T operator[](int i) const {
+		DCHECK(i >= 0 && i <= 1);
+		if (i == 0) return x;
+		return y;
+	}
+
+	T &operator[](int i) {
+		DCHECK(i >= 0 && i <= 1);
+		if (i == 0) return x;
+		return y;
+	}
+	Float LengthSquared() const { return x * x + y * y; }
+	Float Length() const { return std::sqrt(LengthSquared()); }
+
+	// Vector2 Public Data
+	T x, y;
+};
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &os, const Vector2<T> &v) {
+	os << "[ " << v.x << ", " << v.y << " ]";
+	return os;
+}
+
 template <typename T> class Vector3 {
 public:
 	T operator[](int i) const {
@@ -179,6 +280,8 @@ inline Vector3<T>::Vector3(const Point3<T> &p)
 typedef Vector3<Float> Vector3f;
 using color = Vector3f;    // RGB color
 typedef Vector3<int>   Vector3i;
+typedef Vector2<Float> Vector2f;
+typedef Vector2<int>   Vector2i;
 
 template <typename T> class Point3 {
 public:
@@ -438,6 +541,13 @@ public:
 	T x, y;
 };
 
+template <typename T, typename U>
+inline Point2<T> operator*(U f, const Point2<T> &p) {
+	DCHECK(!p.HasNaNs());
+	return p * f;
+}
+
+
 typedef Point2<Float> Point2f;
 typedef Point2<int>   Point2i;
 typedef Point3<Float> Point3f;
@@ -559,6 +669,15 @@ template <typename T> inline Normal3<T>
 		return (Dot(n, v) < 0.f) ? -n : n;
 	}
 
+template <typename T>
+inline Vector3<T> Cross(const Normal3<T> &v1, const Vector3<T> &v2) {
+	DCHECK(!v1.HasNaNs() && !v2.HasNaNs());
+	double v1x = v1.x, v1y = v1.y, v1z = v1.z;
+	double v2x = v2.x, v2y = v2.y, v2z = v2.z;
+	return Vector3<T>((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z),
+		(v1x * v2y) - (v1y * v2x));
+}
+
 typedef Normal3<Float> Normal3f;
 
 class Ray {
@@ -566,7 +685,7 @@ public:
 	Ray() : tMax(Infinity), time(0.f) { }
 	Ray(const Vector3f &o, const Vector3f &d, Float tMax = Infinity, Float time = 0.f)
 		: o(o), d(d), tMax(tMax), time(time){ }
-	Vector3f operator()(Float t) const { return o + d * t; }
+	Vector3f operator()(Float t) const { return Vector3f(o + d * t); }
 	bool HasNaNs() const {
 		return (o.HasNaNs() || d.HasNaNs() || std::isnan(tMax));
 	}
@@ -576,7 +695,7 @@ public:
 		return os;
 	}
 
-	Vector3f o;
+	Point3f  o;
 	Vector3f d;
 	mutable Float tMax;
 	Float time;

@@ -2,6 +2,7 @@
 //#include "stats.h"
 //#include "lowdiscrepancy.h"
 
+static long long nShapesCreated = 0;
 Shape::~Shape() {}
 
 //STAT_COUNTER("Scene/Shapes created", nShapesCreated);
@@ -9,8 +10,9 @@ Shape::Shape(const Transform *ObjectToWorld, const Transform *WorldToObject,
 	bool reverseOrientation)
 	: ObjectToWorld(ObjectToWorld),
 	WorldToObject(WorldToObject),
-	reverseOrientation(reverseOrientation) {
-	//++nShapesCreated;
+	reverseOrientation(reverseOrientation),
+	transformSwapsHandedness(ObjectToWorld->SwapsHandedness()) {
+	++nShapesCreated;
 }
 
 Bounds3f Shape::WorldBound() const { return (*ObjectToWorld)(ObjectBound()); }

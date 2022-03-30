@@ -1,11 +1,12 @@
 #include "primitive.h"
+#include "interaction.h"
 
 static long long primitiveMemory = 0;
 
 Primitive::~Primitive() {}
 
-GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape> &shape)
-	: shape(shape){
+GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape> &shape, const std::shared_ptr<Material> &material)
+	: shape(shape),material(material){
 	primitiveMemory += sizeof(*this);
 }
 
@@ -20,7 +21,7 @@ bool GeometricPrimitive::Intersect(const Ray &r,
 	Float tHit;
 	if (!shape->Intersect(r, &tHit, isect)) return false;
 	r.tMax = tHit;
-	//isect->primitive = this;
+	isect->primitive = this;
 	//CHECK_GE(Dot(isect->n, isect->shading.n), 0.);
 	//// Initialize _SurfaceInteraction::mediumInterface_ after _Shape_
 	//// intersection
@@ -31,4 +32,8 @@ bool GeometricPrimitive::Intersect(const Ray &r,
 	return true;
 }
 
-void GeometricPrimitive::ComputeScatteringFunctions() const{}
+void GeometricPrimitive::ComputeScatteringFunctions(SurfaceInteraction *isect, TransportMode mode,bool allowMultipleLobes) const {
+	if (material)
+		material->ComputeScatteringFunctions(isect, mode,allowMultipleLobes);
+	CHECK_GE(Dot(isect->n, isect->shading.n), 0.);
+}

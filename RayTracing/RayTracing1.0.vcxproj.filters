@@ -48,33 +48,39 @@
     <ClCompile Include="include\core\kdtreeaccel.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\sampler.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\stratified.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\sampling.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\scene.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\integrator.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\reflection.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\interaction.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\material.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ray.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hittable.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\sphere.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\hittable_list.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\rtweekend.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\material.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\aabb.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\bvh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\rtw_stb_image.h">
@@ -84,12 +90,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\box.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="onb.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="pdf.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\core\pbrt.h">
@@ -122,9 +122,6 @@
     <ClInclude Include="include\core\triangle.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\spectrum.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\core\camera.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -137,8 +134,32 @@
     <ClInclude Include="include\core\sampling.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="include\camera.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="include\core\sampler.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\rng.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\stratified.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\scene.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\integrator.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\texture.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\material.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\reflection.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\spectrum.h">
+      <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

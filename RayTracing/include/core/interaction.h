@@ -6,11 +6,12 @@
 #include "pbrt.h"
 #include "geometry.h"
 #include "transform.h"
-
+#include "material.h"
+//#include "reflection.h"
 
 struct Interaction {
 	Interaction() :time(0) { }
-	Interaction(const Vector3f &p, const Normal3f &n,const Vector3f &wo, Float time)
+	Interaction(const Point3f &p, const Normal3f &n,const Vector3f &wo, Float time)
 		: p(p), time(time), wo(wo), n(n) { }
 	bool IsSurfaceInteraction() const {
 		return n != Normal3f();
@@ -49,32 +50,35 @@ struct Interaction {
 class SurfaceInteraction : public Interaction {
 public:
 	SurfaceInteraction() { }
-	//SurfaceInteraction(const Vector3f &p, const Vector3f &pError, const Point2f &uv,
-	//	const Vector3f &wo, const Vector3f &dpdu, const Vector3f &dpdv,
-	//	const Normal3f &dndu, const Normal3f &dndv,
-	//	Float time, const Shape *sh);
+	SurfaceInteraction(const Point3f &p,const Point2f &uv,
+		const Vector3f &wo, const Vector3f &dpdu, const Vector3f &dpdv,
+		const Normal3f &dndu, const Normal3f &dndv,
+		Float time, const Shape *sh, int faceIndex=0);
+	~SurfaceInteraction();
 	//void SetShadingGeometry(const Vector3f &dpdu, const Vector3f &dpdv,
 	//	const Normal3f &dndu, const Normal3f &dndv, bool orientationIsAuthoritative);
 	//void ComputeScatteringFunctions(const RayDifferential &ray,MemoryArena &arena, bool allowMultipleLobes = false);
-	void ComputeScatteringFunctions();
+	void ComputeScatteringFunctions(
+		const Ray &ray, bool allowMultipleLobes = false,
+		TransportMode mode = TransportMode::Radiance);
 	//void ComputeDifferentials(const RayDifferential &r) const;
 	//Spectrum Le(const Vector3f &w) const;
 
-	//Point2f uv;
-	//Vector3f dpdu, dpdv;
-	//Normal3f dndu, dndv;
+	Point2f uv;
+	Vector3f dpdu, dpdv;
+	Normal3f dndu, dndv;
 	const Shape *shape = nullptr;
-	//struct {
-	//	Normal3f n;
-	//	Vector3f dpdu, dpdv;
-	//	Normal3f dndu, dndv;
-	//} shading;
+	struct {
+		Normal3f n;
+		Vector3f dpdu, dpdv;
+		Normal3f dndu, dndv;
+	} shading;
 	const Primitive *primitive = nullptr;
-	//BSDF *bsdf = nullptr;
+	BSDF *bsdf = nullptr;
 	//BSSRDF *bssrdf = nullptr;
 	//mutable Vector3f dpdx, dpdy;
 	//mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
-
+	int faceIndex = 0;
 };
 
 

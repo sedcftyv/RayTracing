@@ -68,7 +68,7 @@ public:
 	// OrthographicCamera Public Methods
 	OrthographicCamera(const Transform &CameraToWorld,
 		const Bounds2f &screenWindow, Float lensRadius,Float focalDistance)
-		: ProjectiveCamera(CameraToWorld, Orthographic(-3, 100), screenWindow,lensRadius, focalDistance) {
+		: ProjectiveCamera(CameraToWorld, Orthographic(0, 1), screenWindow,lensRadius, focalDistance) {
 		// Compute differential changes in origin for orthographic camera rays
 		//dxCamera = RasterToCamera(Vector3f(1, 0, 0));
 		//dyCamera = RasterToCamera(Vector3f(0, 1, 0));

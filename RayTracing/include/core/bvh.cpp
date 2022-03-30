@@ -1,6 +1,7 @@
 #include "bvh.h"
 
-static long long treeBytes = 0;static long long totalPrimitives = 0;
+static long long treeBytes = 0;
+static long long totalPrimitives = 0;
 static long long totalLeafNodes = 0;
 static long long interiorNodes = 0;
 static long long leafNodes = 0;
