@@ -1,6 +1,117 @@
 #include "reflection.h"
 #include "sampling.h"
 
+Fresnel::~Fresnel() {}
+
+Float FrDielectric(Float cosThetaI, Float etaI, Float etaT) {
+	cosThetaI = Clamp(cosThetaI, -1, 1);
+	// Potentially swap indices of refraction
+	bool entering = cosThetaI > 0.f;
+	if (!entering) {
+		std::swap(etaI, etaT);
+		cosThetaI = std::abs(cosThetaI);
+	}
+
+	// Compute _cosThetaT_ using Snell's law
+	Float sinThetaI = std::sqrt(std::max((Float)0, 1 - cosThetaI * cosThetaI));
+	Float sinThetaT = etaI / etaT * sinThetaI;
+
+	// Handle total internal reflection
+	if (sinThetaT >= 1) return 1;
+	Float cosThetaT = std::sqrt(std::max((Float)0, 1 - sinThetaT * sinThetaT));
+	Float Rparl = ((etaT * cosThetaI) - (etaI * cosThetaT)) /
+		((etaT * cosThetaI) + (etaI * cosThetaT));
+	Float Rperp = ((etaI * cosThetaI) - (etaT * cosThetaT)) /
+		((etaI * cosThetaI) + (etaT * cosThetaT));
+	return (Rparl * Rparl + Rperp * Rperp) / 2;
+}
+
+Spectrum FrConductor(Float cosThetaI, const Spectrum &etai,
+	const Spectrum &etat, const Spectrum &k) {
+	cosThetaI = Clamp(cosThetaI, -1, 1);
+	Spectrum eta = etat / etai;
+	Spectrum etak = k / etai;
+
+	Float cosThetaI2 = cosThetaI * cosThetaI;
+	Float sinThetaI2 = 1. - cosThetaI2;
+	Spectrum eta2 = eta * eta;
+	Spectrum etak2 = etak * etak;
+
+	Spectrum t0 = eta2 - etak2 - sinThetaI2;
+	Spectrum a2plusb2 = Sqrt(t0 * t0 + 4 * eta2 * etak2);
+	Spectrum t1 = a2plusb2 + cosThetaI2;
+	Spectrum a = Sqrt(0.5f * (a2plusb2 + t0));
+	Spectrum t2 = (Float)2 * cosThetaI * a;
+	Spectrum Rs = (t1 - t2) / (t1 + t2);
+
+	Spectrum t3 = cosThetaI2 * a2plusb2 + sinThetaI2 * sinThetaI2;
+	Spectrum t4 = t2 * sinThetaI2;
+	Spectrum Rp = Rs * (t3 - t4) / (t3 + t4);
+
+	return 0.5 * (Rp + Rs);
+}
+
+Spectrum FresnelConductor::Evaluate(Float cosThetaI) const {
+	return FrConductor(std::abs(cosThetaI), etaI, etaT, k);
+}
+
+std::string FresnelConductor::ToString() const {
+	return std::string("[ FresnelConductor etaI: ") + etaI.ToString() +
+		std::string(" etaT: ") + etaT.ToString() + std::string(" k: ") +
+		k.ToString() + std::string(" ]");
+}
+
+Spectrum FresnelDielectric::Evaluate(Float cosThetaI) const {
+	return FrDielectric(cosThetaI, etaI, etaT);
+}
+
+std::string FresnelDielectric::ToString() const {
+	return StringPrintf("[ FrenselDielectric etaI: %f etaT: %f ]", etaI, etaT);
+}
+
+Spectrum SpecularReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
+	const Point2f &sample, Float *pdf,
+	BxDFType *sampledType) const {
+	// Compute perfect specular reflection direction
+	*wi = Vector3f(-wo.x, -wo.y, wo.z);
+	*pdf = 1;
+	return fresnel->Evaluate(CosTheta(*wi)) * R / AbsCosTheta(*wi);
+}
+
+std::string SpecularReflection::ToString() const {
+	return std::string("[ SpecularReflection R: ") + R.ToString() +
+		std::string(" fresnel: ") + fresnel->ToString() + std::string(" ]");
+}
+
+Spectrum SpecularTransmission::Sample_f(const Vector3f &wo, Vector3f *wi,
+	const Point2f &sample, Float *pdf,
+	BxDFType *sampledType) const {
+	// Figure out which ¦Ç is incident and which is transmitted
+	bool entering = CosTheta(wo) > 0;
+	Float etaI = entering ? etaA : etaB;
+	Float etaT = entering ? etaB : etaA;
+
+	// Compute ray direction for specular transmission
+	if (!Refract(wo, Faceforward(Normal3f(0, 0, 1), wo), etaI / etaT, wi))
+		return 0;
+	*pdf = 1;
+	Spectrum ft = T * (Spectrum(1.) - fresnel.Evaluate(CosTheta(*wi)));
+	// Account for non-symmetry with transmission to different medium
+	if (mode == TransportMode::Radiance) ft *= (etaI * etaI) / (etaT * etaT);
+	return ft / AbsCosTheta(*wi);
+}
+
+std::string SpecularTransmission::ToString() const {
+	return std::string("[ SpecularTransmission: T: ") + T.ToString() +
+		StringPrintf(" etaA: %f etaB: %f ", etaA, etaB) +
+		std::string(" fresnel: ") + fresnel.ToString() +
+		std::string(" mode : ") +
+		(mode == TransportMode::Radiance ? std::string("RADIANCE")
+			: std::string("IMPORTANCE")) +
+		std::string(" ]");
+}
+
+
 Spectrum BxDF::Sample_f(const Vector3f &wo, Vector3f *wi, const Point2f &u,
 	Float *pdf, BxDFType *sampledType) const {
 	// Cosine-sample the hemisphere, flipping the direction if necessary
@@ -43,7 +154,6 @@ Spectrum BxDF::rho(int nSamples, const Point2f *u1, const Point2f *u2) const {
 Spectrum LambertianReflection::f(const Vector3f &wo, const Vector3f &wi) const {
 	return R * InvPi;
 }
-
 
 
 
@@ -172,3 +282,6 @@ Float BSDF::Pdf(const Vector3f &woWorld, const Vector3f &wiWorld,
 //		s += StringPrintf("\n  bxdfs[%d]: ", i) + bxdfs[i]->ToString();
 //	return s + std::string(" ]");
 //}
+
+
+

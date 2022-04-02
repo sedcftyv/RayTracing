@@ -2,6 +2,7 @@
 #include "shape.h"
 #include "reflection.h"
 #include "primitive.h"
+#include "light.h"
 
 SurfaceInteraction::~SurfaceInteraction()
 {
@@ -40,4 +41,9 @@ void SurfaceInteraction::ComputeScatteringFunctions(const Ray &ray,
 	TransportMode mode) {
 	//ComputeDifferentials(ray);
 	primitive->ComputeScatteringFunctions(this, mode, allowMultipleLobes);
+}
+
+Spectrum SurfaceInteraction::Le(const Vector3f &w) const {
+	const AreaLight *area = primitive->GetAreaLight();
+	return area ? area->L(*this, w) : Spectrum(0.f);
 }

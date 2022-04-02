@@ -1,5 +1,5 @@
 #include "triangle.h"
-
+#include "sampling.h"
 static long long nTris = 0;
 static long long nMeshes = 0;
 static long long nHits = 0;
@@ -143,6 +143,8 @@ bool Triangle::Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
 	Float b2 = e2 * invDet;
 	Float t = tScaled * invDet;
 
+	if (t <= eps) return false;
+
 	Vector3f dpdu, dpdv;
 	Point2f uv[3];
 	GetUVs(uv);
@@ -152,12 +154,20 @@ bool Triangle::Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
 	Point2f uvHit = b0 * uv[0] + b1 * uv[1] + b2 * uv[2];
 	Point3f pHit = b0 * p0 + b1 * p1 + b2 * p2;
 
+	Float determinant = duv02[0] * duv12[1] - duv02[1] * duv12[0];
+	bool degenerateUV = std::abs(determinant) < eps;
+	if (!degenerateUV)
+	{
+		Float invdet = 1 / determinant;
+		dpdu = (duv12[1] * dp02 - duv02[1] * dp12)*invdet;
+		dpdv = (-duv12[0] * dp02 + duv02[0] * dp12)*invdet;
+	}
 
 	*isect = SurfaceInteraction(pHit,uvHit,-ray.d,dpdu,dpdv,Normal3f(0,0,0),Normal3f(0,0,0),ray.time,this,faceIndex);
 
 	// Override surface normal in _isect_ for triangle
 	isect->n = isect->shading.n = Normal3f(Normalize(Cross(dp02, dp12)));
-	isect->p = Vector3f(b0 * p0 + b1 * p1 + b2 * p2);
+	//isect->p = Vector3f(b0 * p0 + b1 * p1 + b2 * p2);
 
 	*tHit = t;
 	++nHits;
@@ -245,6 +255,10 @@ bool Triangle::IntersectP(const Ray &ray, bool testAlphaTexture) const {
 	Float b2 = e2 * invDet;
 	Float t = tScaled * invDet;
 
+	if (t <= eps) return false;
+
+	//Point3f pHit = b0 * p0 + b1 * p1 + b2 * p2;
+
 	++nHits;
 	return true;
 }
@@ -255,6 +269,34 @@ Float Triangle::Area() const {
 	const Point3f &p1 = mesh->p[v[1]];
 	const Point3f &p2 = mesh->p[v[2]];
 	return 0.5 * Cross(p1 - p0, p2 - p0).Length();
+}
+
+Interaction Triangle::Sample(const Point2f &u, Float *pdf) const {
+	Point2f b = UniformSampleTriangle(u);
+	// Get triangle vertices in _p0_, _p1_, and _p2_
+	const Point3f &p0 = mesh->p[v[0]];
+	const Point3f &p1 = mesh->p[v[1]];
+	const Point3f &p2 = mesh->p[v[2]];
+	Interaction it;
+	it.p = b[0] * p0 + b[1] * p1 + (1 - b[0] - b[1]) * p2;
+	// Compute surface normal for sampled point on triangle
+	it.n = Normalize(Normal3f(Cross(p1 - p0, p2 - p0)));
+	// Ensure correct orientation of the geometric normal; follow the same
+	// approach as was used in Triangle::Intersect().
+	if (mesh->n) {
+		Normal3f ns(b[0] * mesh->n[v[0]] + b[1] * mesh->n[v[1]] +
+			(1 - b[0] - b[1]) * mesh->n[v[2]]);
+		it.n = Faceforward(it.n, ns);
+	}
+	else if (reverseOrientation ^ transformSwapsHandedness)
+		it.n *= -1;
+
+	// Compute error bounds for sampled point on triangle
+	Point3f pAbsSum =
+		Abs(b[0] * p0) + Abs(b[1] * p1) + Abs((1 - b[0] - b[1]) * p2);
+	//it.pError = gamma(6) * Vector3f(pAbsSum.x, pAbsSum.y, pAbsSum.z);
+	*pdf = 1 / Area();
+	return it;
 }
 
 std::vector<std::shared_ptr<Shape>> CreateTriangleMesh(

@@ -5,8 +5,30 @@ static long long primitiveMemory = 0;
 
 Primitive::~Primitive() {}
 
-GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape> &shape, const std::shared_ptr<Material> &material)
-	: shape(shape),material(material){
+const AreaLight *Aggregate::GetAreaLight() const {
+	//LOG(FATAL) <<
+	//	"Aggregate::GetAreaLight() method"
+	//	"called; should have gone to GeometricPrimitive";
+	return nullptr;
+}
+
+const Material *Aggregate::GetMaterial() const {
+	//LOG(FATAL) <<
+	//	"Aggregate::GetMaterial() method"
+	//	"called; should have gone to GeometricPrimitive";
+	return nullptr;
+}
+
+const AreaLight *GeometricPrimitive::GetAreaLight() const {
+	return areaLight.get();
+}
+
+const Material *GeometricPrimitive::GetMaterial() const {
+	return material.get();
+}
+
+GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape> &shape, const std::shared_ptr<Material> &material, const std::shared_ptr<AreaLight> &areaLight)
+	: shape(shape),material(material), areaLight(areaLight){
 	primitiveMemory += sizeof(*this);
 }
 

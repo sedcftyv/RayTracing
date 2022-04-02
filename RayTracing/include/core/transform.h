@@ -158,7 +158,7 @@ inline Ray Transform::operator()(const Ray &r) const {
 	//	o += d * dt;
 	//	tMax -= dt;
 	//}
-	return Ray(Vector3f(o), d, tMax, r.time);
+	return Ray(o, d, tMax, r.time);
 }
 
 

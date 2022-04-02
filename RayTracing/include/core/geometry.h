@@ -678,12 +678,30 @@ inline Vector3<T> Cross(const Normal3<T> &v1, const Vector3<T> &v2) {
 		(v1x * v2y) - (v1y * v2x));
 }
 
+template <typename T>
+inline T AbsDot(const Normal3<T> &n1, const Vector3<T> &v2) {
+	DCHECK(!n1.HasNaNs() && !v2.HasNaNs());
+	return std::abs(n1.x * v2.x + n1.y * v2.y + n1.z * v2.z);
+}
+
+template <typename T>
+inline T AbsDot(const Vector3<T> &v1, const Normal3<T> &n2) {
+	DCHECK(!v1.HasNaNs() && !n2.HasNaNs());
+	return std::abs(v1.x * n2.x + v1.y * n2.y + v1.z * n2.z);
+}
+
+template <typename T, typename U>
+inline Normal3<T> operator*(U f, const Normal3<T> &n) {
+	return Normal3<T>(f * n.x, f * n.y, f * n.z);
+}
+
+
 typedef Normal3<Float> Normal3f;
 
 class Ray {
 public:
 	Ray() : tMax(Infinity), time(0.f) { }
-	Ray(const Vector3f &o, const Vector3f &d, Float tMax = Infinity, Float time = 0.f)
+	Ray(const Point3f &o, const Vector3f &d, Float tMax = Infinity, Float time = 0.f)
 		: o(o), d(d), tMax(tMax), time(time){ }
 	Vector3f operator()(Float t) const { return Vector3f(o + d * t); }
 	bool HasNaNs() const {
@@ -993,15 +1011,27 @@ inline bool Bounds3<T>::IntersectP(const Ray &ray, const Vector3f &invDir,const 
 }
 
 
-//inline Vector3f OffsetRayOrigin(const Vector3f &p, const Vector3f &pError,
-//	const Normal3f &n, const Vector3f &w) {
-//	Float d = Dot(Abs(n), pError);
-//	Vector3f offset = d * Vector3f(n);
-//	if (Dot(w, n) < 0)
-//		offset = -offset;
-//	Vector3f po = p + offset;
-//	//<< Round offset point po away from p >>
-//		return po;
-//}
+inline Point3f OffsetRayOrigin(const Point3f &p, const Normal3f &n, const Vector3f &w) {
+	//Float d = Dot(Abs(n), pError);
+	//Vector3f offset = d * Vector3f(n);
+	//if (Dot(w, n) < 0)
+	//	offset = -offset;
+	//Point3f po = p + offset;
+	//<< Round offset point po away from p >>
+	Point3f po = p;
+		return po;
+}
+
+inline Vector3f SphericalDirection(Float sinTheta, Float cosTheta, Float phi) {
+	return Vector3f(sinTheta * std::cos(phi), sinTheta * std::sin(phi),
+		cosTheta);
+}
+
+inline Vector3f SphericalDirection(Float sinTheta, Float cosTheta, Float phi,
+	const Vector3f &x, const Vector3f &y,
+	const Vector3f &z) {
+	return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y +
+		cosTheta * z;
+}
 
 #endif

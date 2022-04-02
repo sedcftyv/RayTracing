@@ -102,20 +102,47 @@ public:
 	const BxDFType type;
 };
 
-
-class LambertianReflection : public BxDF {
+class Fresnel {
 public:
-	// LambertianReflection Public Methods
-	LambertianReflection(const Spectrum &R)
-		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), R(R) {}
-	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
-	Spectrum rho(const Vector3f &, int, const Point2f *) const { return R; }
-	Spectrum rho(int, const Point2f *, const Point2f *) const { return R; }
-	//std::string ToString() const;
+	// Fresnel Interface
+	virtual ~Fresnel();
+	virtual Spectrum Evaluate(Float cosI) const = 0;
+	virtual std::string ToString() const = 0;
+};
+
+inline std::ostream &operator<<(std::ostream &os, const Fresnel &f) {
+	os << f.ToString();
+	return os;
+}
+
+class FresnelConductor : public Fresnel {
+public:
+	// FresnelConductor Public Methods
+	Spectrum Evaluate(Float cosThetaI) const;
+	FresnelConductor(const Spectrum &etaI, const Spectrum &etaT,
+		const Spectrum &k)
+		: etaI(etaI), etaT(etaT), k(k) {}
+	std::string ToString() const;
 
 private:
-	// LambertianReflection Private Data
-	const Spectrum R;
+	Spectrum etaI, etaT, k;
+};
+
+class FresnelDielectric : public Fresnel {
+public:
+	// FresnelDielectric Public Methods
+	Spectrum Evaluate(Float cosThetaI) const;
+	FresnelDielectric(Float etaI, Float etaT) : etaI(etaI), etaT(etaT) {}
+	std::string ToString() const;
+
+private:
+	Float etaI, etaT;
+};
+
+class FresnelNoOp : public Fresnel {
+public:
+	Spectrum Evaluate(Float) const { return Spectrum(1.); }
+	std::string ToString() const { return "[ FresnelNoOp ]"; }
 };
 
 //class SurfaceInteraction;
@@ -179,6 +206,70 @@ inline int BSDF::NumComponents(BxDFType flags) const {
 		if (bxdfs[i]->MatchesFlags(flags)) ++num;
 	return num;
 }
+
+
+class LambertianReflection : public BxDF {
+public:
+	// LambertianReflection Public Methods
+	LambertianReflection(const Spectrum &R)
+		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), R(R) {}
+	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
+	Spectrum rho(const Vector3f &, int, const Point2f *) const { return R; }
+	Spectrum rho(int, const Point2f *, const Point2f *) const { return R; }
+	//std::string ToString() const;
+
+private:
+	// LambertianReflection Private Data
+	const Spectrum R;
+};
+
+class SpecularReflection : public BxDF {
+public:
+	// SpecularReflection Public Methods
+	SpecularReflection(const Spectrum &R, Fresnel *fresnel)
+		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR)),
+		R(R),
+		fresnel(fresnel) {}
+	Spectrum f(const Vector3f &wo, const Vector3f &wi) const {
+		return Spectrum(0.f);
+	}
+	Spectrum Sample_f(const Vector3f &wo, Vector3f *wi, const Point2f &sample,
+		Float *pdf, BxDFType *sampledType) const;
+	Float Pdf(const Vector3f &wo, const Vector3f &wi) const { return 0; }
+	std::string ToString() const;
+
+private:
+	// SpecularReflection Private Data
+	const Spectrum R;
+	const Fresnel *fresnel;
+};
+
+class SpecularTransmission : public BxDF {
+public:
+	// SpecularTransmission Public Methods
+	SpecularTransmission(const Spectrum &T, Float etaA, Float etaB,
+		TransportMode mode)
+		: BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_SPECULAR)),
+		T(T),
+		etaA(etaA),
+		etaB(etaB),
+		fresnel(etaA, etaB),
+		mode(mode) {}
+	Spectrum f(const Vector3f &wo, const Vector3f &wi) const {
+		return Spectrum(0.f);
+	}
+	Spectrum Sample_f(const Vector3f &wo, Vector3f *wi, const Point2f &sample,
+		Float *pdf, BxDFType *sampledType) const;
+	Float Pdf(const Vector3f &wo, const Vector3f &wi) const { return 0; }
+	std::string ToString() const;
+
+private:
+	// SpecularTransmission Private Data
+	const Spectrum T;
+	const Float etaA, etaB;
+	const FresnelDielectric fresnel;
+	const TransportMode mode;
+};
 
 //inline std::ostream &operator<<(std::ostream &os, const BSDF &bsdf) {
 //	os << bsdf.ToString();

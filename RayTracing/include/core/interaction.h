@@ -16,30 +16,29 @@ struct Interaction {
 	bool IsSurfaceInteraction() const {
 		return n != Normal3f();
 	}
-	//Ray SpawnRay(const Vector3f &d) const {
-	//	Vector3f o = OffsetRayOrigin(p, pError, n, d);
-	//	return Ray(o, d, Infinity, time);
-	//}
-	//Ray SpawnRayTo(const Vector3f &p2) const {
-	//	Vector3f origin = OffsetRayOrigin(p, pError, n, p2 - p);
-	//	Vector3f d = p2 - origin;
-	//	return Ray(origin, d, 1 - ShadowEpsilon, time );
-	//}
-	//Ray SpawnRayTo(const Interaction &it) const {
-	//	Vector3f origin = OffsetRayOrigin(p, pError, n, it.p - p);
-	//	Vector3f target = OffsetRayOrigin(it.p, it.pError, it.n, origin - it.p);
-	//	Vector3f d = target - origin;
-	//	return Ray(origin, d, 1 - ShadowEpsilon, time);
-	//}
-	//Interaction(const Vector3f &p, const Vector3f &wo, Float time,
-	//	const MediumInterface &mediumInterface)
-	//	: p(p), time(time), wo(wo){ }
-	//Interaction(const Vector3f &p, Float time)
-	//	: p(p), time(time){ }
+	Ray SpawnRay(const Vector3f &d) const {
+		Point3f  o = OffsetRayOrigin(p,  n, d);
+		return Ray(o, d, Infinity, time);
+	}
+	Ray SpawnRayTo(const Point3f  &p2) const {
+		Point3f  origin = OffsetRayOrigin(p, n, Vector3f(p2 - p));
+		Vector3f d = Vector3f(p2 - origin);
+		return Ray(origin, d, 1 - ShadowEpsilon, time );
+	}
+	Ray SpawnRayTo(const Interaction &it) const {
+		Point3f  origin = OffsetRayOrigin(p,  n, it.p - p);
+		Point3f  target = OffsetRayOrigin(it.p,  it.n, origin - it.p);
+		Vector3f d = target - origin;
+		return Ray(origin, d, 1 - ShadowEpsilon, time);
+	}
+	Interaction(const Point3f &p, const Vector3f &wo, Float time)
+		: p(p), time(time), wo(wo){ }
+	Interaction(const Point3f &p, Float time)
+		: p(p), time(time){ }
 	//bool IsMediumInteraction() const { return !IsSurfaceInteraction(); }
 
 	//<< Interaction Public Data >>
-	Vector3f p;
+	Point3f p;
 	Float time;
 	//Vector3f pError;
 	Vector3f wo;
@@ -62,7 +61,7 @@ public:
 		const Ray &ray, bool allowMultipleLobes = false,
 		TransportMode mode = TransportMode::Radiance);
 	//void ComputeDifferentials(const RayDifferential &r) const;
-	//Spectrum Le(const Vector3f &w) const;
+	Spectrum Le(const Vector3f &w) const;
 
 	Point2f uv;
 	Vector3f dpdu, dpdv;

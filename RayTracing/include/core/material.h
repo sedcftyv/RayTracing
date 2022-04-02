@@ -29,9 +29,48 @@ private:
 	std::shared_ptr<Texture<Float>> sigma, bumpMap;
 };
 
+class MirrorMaterial : public Material {
+public:
+	// MirrorMaterial Public Methods
+	MirrorMaterial(const std::shared_ptr<Texture<Spectrum>> &r,
+		const std::shared_ptr<Texture<Float>> &bump) {
+		Kr = r;
+		bumpMap = bump;
+	}
+	void ComputeScatteringFunctions(SurfaceInteraction *si,TransportMode mode,
+		bool allowMultipleLobes) const;
 
+private:
+	// MirrorMaterial Private Data
+	std::shared_ptr<Texture<Spectrum>> Kr;
+	std::shared_ptr<Texture<Float>> bumpMap;
+};
 
+class GlassMaterial : public Material {
+public:
+	// GlassMaterial Public Methods
+	GlassMaterial(const std::shared_ptr<Texture<Spectrum>> &Kr,
+		const std::shared_ptr<Texture<Spectrum>> &Kt,
+		//const std::shared_ptr<Texture<Float>> &uRoughness,
+		//const std::shared_ptr<Texture<Float>> &vRoughness,
+		const std::shared_ptr<Texture<Float>> &index,
+		const std::shared_ptr<Texture<Float>> &bumpMap)
+		: Kr(Kr),
+		Kt(Kt),
+		index(index),
+		bumpMap(bumpMap){}
+	void ComputeScatteringFunctions(SurfaceInteraction *si,
+		TransportMode mode,
+		bool allowMultipleLobes) const;
 
+private:
+	// GlassMaterial Private Data
+	std::shared_ptr<Texture<Spectrum>> Kr, Kt;
+	//std::shared_ptr<Texture<Float>> uRoughness, vRoughness;
+	std::shared_ptr<Texture<Float>> index;
+	std::shared_ptr<Texture<Float>> bumpMap;
+	//bool remapRoughness;
+};
 
 
 

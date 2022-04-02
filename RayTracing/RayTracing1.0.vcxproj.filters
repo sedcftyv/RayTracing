@@ -72,24 +72,15 @@
     <ClCompile Include="include\core\material.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\light.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rtweekend.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\aabb.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\bvh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\rtw_stb_image.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\aarect.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\box.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\core\pbrt.h">
@@ -161,9 +152,11 @@
     <ClInclude Include="include\core\spectrum.h">
       <Filter>core</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram21.cd" />
+    <ClInclude Include="include\core\light.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\stringprint.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #define PBRT_CORE_SPECTRUM_H
 
 #include "pbrt.h"
+#include "stringprint.h"
 
 enum class SpectrumType { Reflectance, Illuminant };
 

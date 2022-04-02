@@ -43,8 +43,8 @@ public:
 	bool IntersectP(const Ray &ray, bool testAlphaTexture = true) const;
 	Float Area() const;
 
-	//using Shape::Sample;  // Bring in the other Sample() overload.
-	//Interaction Sample(const Point2f &u, Float *pdf) const;
+	using Shape::Sample;  // Bring in the other Sample() overload.
+	Interaction Sample(const Point2f &u, Float *pdf) const;
 
 	// Returns the solid angle subtended by the triangle w.r.t. the given
 	// reference point p.

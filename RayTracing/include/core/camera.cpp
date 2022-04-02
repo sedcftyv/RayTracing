@@ -19,7 +19,7 @@ Float OrthographicCamera::GenerateRay(const CameraSample &sample, Ray *ray) cons
 	// Compute raster and camera sample positions
 	Point3f pFilm = Point3f(sample.pFilm.x, sample.pFilm.y, 0);
 	Point3f pCamera = RasterToCamera(pFilm);
-	*ray = Ray(Vector3f(pCamera), Vector3f(0, 0, 1));
+	*ray = Ray(pCamera, Vector3f(0, 0, 1));
 	// Modify ray for depth of field
 	*ray = CameraToWorld(*ray);
 	return 1;
@@ -57,7 +57,7 @@ Float PerspectiveCamera::GenerateRay(const CameraSample &sample,Ray *ray) const 
 	// Compute raster and camera sample positions
 	Point3f pFilm = Point3f(sample.pFilm.x, sample.pFilm.y, 0);
 	Point3f pCamera = RasterToCamera(pFilm);
-	*ray = Ray(Vector3f(Point3f(0, 0, 0)), Normalize(Vector3f(pCamera)));
+	*ray = Ray(Point3f(0, 0, 0), Normalize(Vector3f(pCamera)));
 	*ray = CameraToWorld(*ray);
 	return 1;
 }

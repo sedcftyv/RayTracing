@@ -63,8 +63,11 @@ template <typename T>
 class Texture;
 class Material;
 typedef RGBSpectrum Spectrum;
-
-
+class Scene;
+class Light;
+class VisibilityTester;
+class AreaLight;
+class Sampler;
 
 template <typename T, typename U, typename V>
 inline T Clamp(T val, U low, V high) {
@@ -90,6 +93,7 @@ static const Float PiOver2 = 1.57079632679489661923;
 static const Float PiOver4 = 0.78539816339744830961;
 static const Float Sqrt2 = 1.41421356237309504880;
 const Float ShadowEpsilon = 0.0001f;
+const Float eps = 1e-4;
 static constexpr Float MachineEpsilon = std::numeric_limits<Float>::epsilon() * 0.5;
 static constexpr Float Infinity = std::numeric_limits<Float>::infinity();
 

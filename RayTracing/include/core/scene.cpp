@@ -1,7 +1,15 @@
 #include "scene.h"
-
+#include "light.h"
 static long long nIntersectionTests = 0;
 static long long nShadowTests = 0;
+
+Scene::Scene(std::shared_ptr<Primitive> aggregate, const std::vector<std::shared_ptr<Light>> &lights) : lights(lights), aggregate(aggregate) {
+	// Scene Constructor Implementation
+	worldBound = aggregate->WorldBound();
+	for (const auto &light : lights) {
+		light->Preprocess(*this);
+	}
+}
 
 bool Scene::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
 	++nIntersectionTests;

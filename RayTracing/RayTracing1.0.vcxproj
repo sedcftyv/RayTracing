@@ -160,6 +160,7 @@
     <ClCompile Include="include\core\integrator.cpp" />
     <ClCompile Include="include\core\interaction.cpp" />
     <ClCompile Include="include\core\kdtreeaccel.cpp" />
+    <ClCompile Include="include\core\light.cpp" />
     <ClCompile Include="include\core\material.cpp" />
     <ClCompile Include="include\core\primitive.cpp" />
     <ClCompile Include="include\core\reflection.cpp" />
@@ -174,10 +175,6 @@
     <ClCompile Include="RayTracing.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\aabb.h" />
-    <ClInclude Include="include\aarect.h" />
-    <ClInclude Include="include\box.h" />
-    <ClInclude Include="include\bvh.h" />
     <ClInclude Include="include\core\bvh.h" />
     <ClInclude Include="include\core\camera.h" />
     <ClInclude Include="include\core\error.h" />
@@ -185,6 +182,7 @@
     <ClInclude Include="include\core\integrator.h" />
     <ClInclude Include="include\core\interaction.h" />
     <ClInclude Include="include\core\kdtreeaccel.h" />
+    <ClInclude Include="include\core\light.h" />
     <ClInclude Include="include\core\material.h" />
     <ClInclude Include="include\core\objload.h" />
     <ClInclude Include="include\core\pbrt.h" />
@@ -198,15 +196,12 @@
     <ClInclude Include="include\core\spectrum.h" />
     <ClInclude Include="include\core\sphere.h" />
     <ClInclude Include="include\core\stratified.h" />
+    <ClInclude Include="include\core\stringprint.h" />
     <ClInclude Include="include\core\texture.h" />
     <ClInclude Include="include\core\transform.h" />
     <ClInclude Include="include\core\triangle.h" />
     <ClInclude Include="include\rtweekend.h" />
     <ClInclude Include="include\rtw_stb_image.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram21.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
