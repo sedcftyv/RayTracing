@@ -117,7 +117,7 @@ void Cornellbox(shared_ptr<Scene> &scene)
 	std::vector<std::shared_ptr<Shape>> meshAreaLight = CreateTriangleMesh(&tri_Object2World_AreaLight, &tri_World2Object_AreaLight, false, nTrianglesAreaLight, vertexIndicesAreaLight, nVerticesAreaLight, P_AreaLight, nullptr, nullptr, nullptr, nullptr);
 	for (int i = 0; i < nTrianglesAreaLight; ++i)
 	{
-		area = make_shared<DiffuseAreaLight>(tri_Object2World_AreaLight, Spectrum(30.f), 5, meshAreaLight[i], false);
+		area = make_shared<DiffuseAreaLight>(tri_Object2World_AreaLight, Spectrum(15.f), 5, meshAreaLight[i], false);
 		lights.push_back(area);
 		prims.push_back(make_shared<GeometricPrimitive>(meshAreaLight[i], m1, area));
 	}
@@ -159,7 +159,7 @@ void Cornellbox(shared_ptr<Scene> &scene)
 		if(i<2)
 			prims.push_back(make_shared<GeometricPrimitive>(meshFloor[i], m1, area));
 		else if(i<4)
-			prims.push_back(make_shared<GeometricPrimitive>(meshFloor[i], mblack, area));
+			prims.push_back(make_shared<GeometricPrimitive>(meshFloor[i], m1, area));
 		else if (i < 6)
 			prims.push_back(make_shared<GeometricPrimitive>(meshFloor[i], m1, area));
 		else if (i < 8)
@@ -285,9 +285,10 @@ int main()
 	Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
 	Transform Camera2World = Inverse(lookat);
 	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World));
-	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(5,5,true,1);
+	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
 	Bounds2i pixelBounds;
-	shared_ptr<Integrator>SI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
+	shared_ptr<Integrator>wSI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
+	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(5, cam, ss, pixelBounds,1.f);
 
-	SI->Render(*worldScene);
+	pSI->Render(*worldScene);
 }

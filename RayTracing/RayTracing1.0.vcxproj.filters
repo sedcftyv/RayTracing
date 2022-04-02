@@ -75,6 +75,9 @@
     <ClCompile Include="include\core\light.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\lightdistrib.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rtweekend.h">
@@ -156,6 +159,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="include\core\stringprint.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\lightdistrib.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

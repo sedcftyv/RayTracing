@@ -84,6 +84,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\external;C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -161,6 +162,7 @@
     <ClCompile Include="include\core\interaction.cpp" />
     <ClCompile Include="include\core\kdtreeaccel.cpp" />
     <ClCompile Include="include\core\light.cpp" />
+    <ClCompile Include="include\core\lightdistrib.cpp" />
     <ClCompile Include="include\core\material.cpp" />
     <ClCompile Include="include\core\primitive.cpp" />
     <ClCompile Include="include\core\reflection.cpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="include\core\interaction.h" />
     <ClInclude Include="include\core\kdtreeaccel.h" />
     <ClInclude Include="include\core\light.h" />
+    <ClInclude Include="include\core\lightdistrib.h" />
     <ClInclude Include="include\core\material.h" />
     <ClInclude Include="include\core\objload.h" />
     <ClInclude Include="include\core\pbrt.h" />
