@@ -3,6 +3,7 @@
 #include "core/texture.h"
 void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,TransportMode mode,
 	bool allowMultipleLobes) const {
+	
 	// Perform bump mapping with _bumpMap_, if present
 	//if (bumpMap) Bump(bumpMap, si);
 

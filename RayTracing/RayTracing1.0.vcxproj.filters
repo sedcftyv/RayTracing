@@ -16,6 +16,9 @@
     <Filter Include="core">
       <UniqueIdentifier>{e3f101b9-f46a-4777-8623-134fe7cd7fea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ext">
+      <UniqueIdentifier>{6d5f0d30-8d89-4005-9f8b-8cdd91a4a342}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RayTracing.cpp">
@@ -76,6 +79,21 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="include\core\lightdistrib.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\modelload.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\texture.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\imageio.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ext\lodepng.cpp">
+      <Filter>ext</Filter>
+    </ClCompile>
+    <ClCompile Include="include\core\imagemap.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,5 +182,23 @@
     <ClInclude Include="include\core\lightdistrib.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\modelload.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\mipmap.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\imagemap.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\imageio.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ext\lodepng.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram2.cd" />
   </ItemGroup>
 </Project>

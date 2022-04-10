@@ -459,13 +459,16 @@ inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per
 void SamplerIntegrator::Render(const Scene &scene) {
 	Preprocess(scene, *sampler);
 	std::ofstream fout("image.ppm");
-	int image_height = 500;
-	int image_width = 500;
+	int image_height = 300;
+	int image_width = 300;
 	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 	Vector3f Light(-2.0,4.0,-3.0);
 	Point3f LightPosition(1.0, 4, -3.0);
 	for (int j = 0; j < image_height; j++) {
+		if (j % 10 == 0)
+			cout << j << endl;
 		for (int i = 0; i < image_width; i++) {
+			//cout << j << ' ' << i << endl;
 			std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * image_width);
 			Point2i pixel = Point2i(i, j);
 			pixel_sampler->StartPixel(pixel);

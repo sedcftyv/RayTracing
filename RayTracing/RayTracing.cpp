@@ -76,6 +76,7 @@ void Cornellbox(shared_ptr<Scene> &scene)
 	Spectrum green(0.0f, 1.0f,0.0f);
 	shared_ptr<Material> m1 = make_shared<MatteMaterial>(make_shared<ConstantTexture<Spectrum>>(LightColor) , sigma, bump);
 	shared_ptr<Material> mgreen = make_shared<MatteMaterial>(make_shared<ConstantTexture<Spectrum>>(green), sigma, bump);
+	shared_ptr<Material> mirror = make_shared<MirrorMaterial>(make_shared<ConstantTexture<Spectrum>>(green), bump);
 
 	shared_ptr<AreaLight>area;
 	std::vector<std::shared_ptr<Primitive>> prims;

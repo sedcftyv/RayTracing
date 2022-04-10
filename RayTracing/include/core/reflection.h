@@ -157,7 +157,10 @@ public:
 		ts(Cross(ns, ss)) {}
 	~BSDF() {
 		for (int i = 0; i < nBxDFs; ++i)
-			bxdfs[i]->~BxDF();
+		{
+			delete bxdfs[i];
+			//bxdfs[i]->~BxDF();
+		}
 	}
 	void Add(BxDF *b) {
 		CHECK_LT(nBxDFs, MaxBxDFs);
@@ -213,6 +216,9 @@ public:
 	// LambertianReflection Public Methods
 	LambertianReflection(const Spectrum &R)
 		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), R(R) {}
+	//~LambertianReflection() {
+	//if()
+	//};
 	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
 	Spectrum rho(const Vector3f &, int, const Point2f *) const { return R; }
 	Spectrum rho(int, const Point2f *, const Point2f *) const { return R; }
@@ -230,6 +236,10 @@ public:
 		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_SPECULAR)),
 		R(R),
 		fresnel(fresnel) {}
+	~SpecularReflection(){
+		if (fresnel!=nullptr)
+			delete fresnel;
+	}
 	Spectrum f(const Vector3f &wo, const Vector3f &wi) const {
 		return Spectrum(0.f);
 	}

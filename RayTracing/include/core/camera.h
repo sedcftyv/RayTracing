@@ -48,7 +48,7 @@ public:
 		// Compute projective camera transformations
 
 		// Compute projective camera screen transformations
-		ScreenToRaster = Scale(500, 500, 1) *
+		ScreenToRaster = Scale(300, 300, 1) *
 			Scale(1 / (screenWindow.pMax.x - screenWindow.pMin.x),
 				1 / (screenWindow.pMin.y - screenWindow.pMax.y), 1) *
 			Translate(Vector3f(-screenWindow.pMin.x, -screenWindow.pMax.y, 0));

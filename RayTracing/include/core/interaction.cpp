@@ -6,7 +6,9 @@
 
 SurfaceInteraction::~SurfaceInteraction()
 {
-	if (bsdf)bsdf->~BSDF();
+	if (bsdf)
+		delete bsdf;
+		//bsdf->~BSDF();
 }
 SurfaceInteraction::SurfaceInteraction(
 	const Point3f &p,const Point2f &uv,

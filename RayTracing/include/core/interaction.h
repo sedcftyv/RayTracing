@@ -75,8 +75,8 @@ public:
 	const Primitive *primitive = nullptr;
 	BSDF *bsdf = nullptr;
 	//BSSRDF *bssrdf = nullptr;
-	//mutable Vector3f dpdx, dpdy;
-	//mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
+	mutable Vector3f dpdx, dpdy;
+	mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
 	int faceIndex = 0;
 };
 

@@ -12,6 +12,16 @@
 #include <string>
 #include <vector>
 #include <assert.h>
+#include <malloc.h>
+#include <map>
+#include <cctype>
+
+using std::vector;
+using std::shared_ptr;
+using std::unique_ptr;
+using std::make_shared;
+using std::make_unique;
+using std::string;
 
 
 #define CHECK_NE(a)
@@ -22,6 +32,12 @@
 #define DCHECK_NE(a)
 #define CHECK(a)
 #define CHECK_GT(a)
+
+#ifndef PBRT_L1_CACHE_LINE_SIZE
+#define PBRT_L1_CACHE_LINE_SIZE 64
+#endif
+
+#define PBRT_HAVE__ALIGNED_MALLOC
 
 
 #define PBRT_CONSTEXPR constexpr
@@ -68,6 +84,91 @@ class Light;
 class VisibilityTester;
 class AreaLight;
 class Sampler;
+class TriangleMesh;
+
+inline void *AllocAligned(size_t size) {
+#if defined(PBRT_HAVE__ALIGNED_MALLOC)
+	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
+#elif defined(PBRT_HAVE_POSIX_MEMALIGN)
+	void *ptr;
+	if (posix_memalign(&ptr, PBRT_L1_CACHE_LINE_SIZE, size) != 0) ptr = nullptr;
+	return ptr;
+#else
+	return memalign(PBRT_L1_CACHE_LINE_SIZE, size);
+#endif
+}
+
+template <typename T>
+T *AllocAligned(size_t count) {
+	return (T *)AllocAligned(count * sizeof(T));
+}
+
+inline void FreeAligned(void *ptr) {
+	if (!ptr) return;
+#if defined(PBRT_HAVE__ALIGNED_MALLOC)
+	_aligned_free(ptr);
+#else
+	free(ptr);
+#endif
+}
+
+template <typename T, int logBlockSize=2>
+class BlockedArray {
+public:
+	// BlockedArray Public Methods
+	BlockedArray(int uRes, int vRes, const T *d = nullptr)
+		: uRes(uRes), vRes(vRes), uBlocks(RoundUp(uRes) >> logBlockSize) {
+		int nAlloc = RoundUp(uRes) * RoundUp(vRes);
+		data = AllocAligned<T>(nAlloc);
+		for (int i = 0; i < nAlloc; ++i) new (&data[i]) T();
+		if (d)
+			for (int v = 0; v < vRes; ++v)
+				for (int u = 0; u < uRes; ++u) (*this)(u, v) = d[v * uRes + u];
+	}
+	PBRT_CONSTEXPR int BlockSize() const { return 1 << logBlockSize; }
+	int RoundUp(int x) const {
+		return (x + BlockSize() - 1) & ~(BlockSize() - 1);
+	}
+	int uSize() const { return uRes; }
+	int vSize() const { return vRes; }
+	~BlockedArray() {
+		for (int i = 0; i < uRes * vRes; ++i) data[i].~T();
+		FreeAligned(data);
+	}
+	int Block(int a) const { return a >> logBlockSize; }
+	int Offset(int a) const { return (a & (BlockSize() - 1)); }
+	T &operator()(int u, int v) {
+		int bu = Block(u), bv = Block(v);
+		int ou = Offset(u), ov = Offset(v);
+		int offset = BlockSize() * BlockSize() * (uBlocks * bv + bu);
+		offset += BlockSize() * ov + ou;
+		return data[offset];
+	}
+	const T &operator()(int u, int v) const {
+		int bu = Block(u), bv = Block(v);
+		int ou = Offset(u), ov = Offset(v);
+		int offset = BlockSize() * BlockSize() * (uBlocks * bv + bu);
+		offset += BlockSize() * ov + ou;
+		return data[offset];
+	}
+	void GetLinearArray(T *a) const {
+		for (int v = 0; v < vRes; ++v)
+			for (int u = 0; u < uRes; ++u) *a++ = (*this)(u, v);
+	}
+
+private:
+	// BlockedArray Private Data
+	T *data;
+	const int uRes, vRes, uBlocks;
+};
+
+inline bool HasExtension(const std::string &value, const std::string &ending) {
+	if (ending.size() > value.size()) return false;
+	return std::equal(
+		ending.rbegin(), ending.rend(), value.rbegin(),
+		[](char a, char b) { return std::tolower(a) == std::tolower(b); });
+}
+
 
 template <typename T, typename U, typename V>
 inline T Clamp(T val, U low, V high) {
@@ -156,13 +257,14 @@ inline constexpr Float gamma(int n) {
 	return (n * MachineEpsilon) / (1 - n * MachineEpsilon);
 }
 
-inline void FreeAligned(void *ptr) {
-	if (!ptr) return;
-#if defined(PBRT_HAVE__ALIGNED_MALLOC)
-	_aligned_free(ptr);
-#else
-	free(ptr);
-#endif
+inline Float GammaCorrect(Float value) {
+	if (value <= 0.0031308f) return 12.92f * value;
+	return 1.055f * std::pow(value, (Float)(1.f / 2.4f)) - 0.055f;
+}
+
+inline Float InverseGammaCorrect(Float value) {
+	if (value <= 0.04045f) return value * 1.f / 12.92f;
+	return std::pow((value + 0.055f) * 1.f / 1.055f, (Float)2.4f);
 }
 
 inline Float Lerp(Float t, Float v1, Float v2) 
