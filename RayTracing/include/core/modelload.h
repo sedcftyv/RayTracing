@@ -26,7 +26,7 @@ public:
 	void buildTextureModel(Transform& tri_Object2World, vector<shared_ptr<Primitive>>&prims);
 };
 
- shared_ptr<Material> getDiffuseMaterial(string filename)
+ inline shared_ptr<Material> getDiffuseMaterial(string filename)
 {
 	unique_ptr<TextureMapping2D> map = make_unique<UVMapping2D>(1.f,1.f,0.f,0.f);
 	ImageWrap wrapMode = ImageWrap::Repeat;

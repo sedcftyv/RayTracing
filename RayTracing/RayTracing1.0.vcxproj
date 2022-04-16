@@ -121,7 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Program Files (x86)\Assimp\lib\assimp-vc141-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Program Files (x86)\Assimp\lib\assimp-vc141-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,12 +166,11 @@
   <ItemGroup>
     <ClCompile Include="include\core\bvh.cpp" />
     <ClCompile Include="include\core\camera.cpp" />
-    <ClCompile Include="include\core\geometry.cpp" />
     <ClCompile Include="include\core\imageio.cpp" />
     <ClCompile Include="include\core\imagemap.cpp" />
+    <ClCompile Include="include\core\infinite.cpp" />
     <ClCompile Include="include\core\integrator.cpp" />
     <ClCompile Include="include\core\interaction.cpp" />
-    <ClCompile Include="include\core\kdtreeaccel.cpp" />
     <ClCompile Include="include\core\light.cpp" />
     <ClCompile Include="include\core\lightdistrib.cpp" />
     <ClCompile Include="include\core\material.cpp" />
@@ -197,9 +196,9 @@
     <ClInclude Include="include\core\geometry.h" />
     <ClInclude Include="include\core\imageio.h" />
     <ClInclude Include="include\core\imagemap.h" />
+    <ClInclude Include="include\core\infinite.h" />
     <ClInclude Include="include\core\integrator.h" />
     <ClInclude Include="include\core\interaction.h" />
-    <ClInclude Include="include\core\kdtreeaccel.h" />
     <ClInclude Include="include\core\light.h" />
     <ClInclude Include="include\core\lightdistrib.h" />
     <ClInclude Include="include\core\material.h" />

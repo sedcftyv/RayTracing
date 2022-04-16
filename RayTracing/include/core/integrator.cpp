@@ -5,7 +5,8 @@
 #include "interaction.h"
 #include "reflection.h"
 #include "light.h"
-
+#include "core/mipmap.h"
+#include "core/spectrum.h"
 using std::cout;
 using std::endl;
 
@@ -360,15 +361,19 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 				L += beta * isect.Le(-ray.d);
 				//VLOG(2) << "Added Le -> L = " << L;
 			}
-			//else {
-			//	for (const auto &light : scene.infiniteLights)
-			//		L += beta * light->Le(ray);
-			//	//VLOG(2) << "Added infinite area lights -> L = " << L;
-			//}
+			else {
+				for (const auto &light : scene.infiniteLights)
+					L += beta * light->Le(ray);
+				//VLOG(2) << "Added infinite area lights -> L = " << L;
+			}
 		}
 
 		// Terminate path if ray escaped or _maxDepth_ was reached
-		if (!foundIntersection || bounces >= maxDepth) break;
+		if (!foundIntersection || bounces >= maxDepth)
+		{
+			
+			break;
+		}
 
 		// Compute scattering functions and skip over medium boundaries
 		isect.ComputeScatteringFunctions(ray, true);
@@ -457,6 +462,21 @@ inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per
 }
 
 void SamplerIntegrator::Render(const Scene &scene) {
+
+	//int mw = 400, mh = 235;
+	//Spectrum * mpdata = new Spectrum[mw*mh];
+	//for(int j=0;j<mh;++j)
+	//	for (int i = 0; i < mw; ++i)
+	//	{
+	//		int offset = i + j * mw;
+	//		Spectrum s;
+	//		s[0] = i / (float)800;
+	//		s[1] = j / (float)800;
+	//		s[2] = 0.4f;
+	//		mpdata[offset] = s;
+	//	}
+	//MIPMap<Spectrum>mp(Point2i(mw, mh), mpdata, true);
+
 	Preprocess(scene, *sampler);
 	std::ofstream fout("image.ppm");
 	int image_height = 300;
@@ -469,6 +489,14 @@ void SamplerIntegrator::Render(const Scene &scene) {
 			cout << j << endl;
 		for (int i = 0; i < image_width; i++) {
 			//cout << j << ' ' << i << endl;
+			//Spectrum colObj(0.0);
+			//if (i < mw - 1 && j < mh - 1)
+			//	colObj = mp.Lookup(Point2f((i + 1) / (float)image_width, (j + 1) / (float)image_height), 0.0f);
+			//else
+			//	colObj = Spectrum(0.f);
+			//write_color(fout, colObj, 1);
+			//continue;
+
 			std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * image_width);
 			Point2i pixel = Point2i(i, j);
 			pixel_sampler->StartPixel(pixel);
@@ -482,33 +510,7 @@ void SamplerIntegrator::Render(const Scene &scene) {
 				SurfaceInteraction  isect;
 				//r.d = Vector3f(0.663268, 0.273197, -0.696735);
 				colObj += Li(r,scene,*pixel_sampler,0);
-				//cout << r.d << ' ' << colObj << endl;
-				//if (scene.Intersect(r, &isect))
-				//{
-				//	//cout << isect.p << endl;
-				//	Interaction p1;
-				//	Vector3f wi;
-				//	VisibilityTester vist;
-				//	Float pdf_light;
-				//	Spectrum colTmp(0.0);
-				//	for (int count = 0; count < scene.lights.size(); count++)
-				//	{
-				//		Spectrum Li = scene.lights[count]->Sample_Li(isect, pixel_sampler->Get2D(), &wi, &pdf_light, &vist);
-				//		if (vist.Unoccluded(scene))
-				//		{
-				//			//cout << Li << endl;
-				//			isect.ComputeScatteringFunctions(r);
-				//			Vector3f wo = isect.wo;
 
-				//			Spectrum f = isect.bsdf->f(wo, wi);
-				//			Float pdf_scattering = isect.bsdf->Pdf(wo, wi);
-				//			//cout << f << ' ' << pdf << endl;
-				//			colTmp += Li * pdf_scattering * f*3.0f / pdf_light;
-				//		}
-				//	}
-				//	colTmp /= scene.lights.size();
-				//	colObj += colTmp;
-				//}
 			} while (pixel_sampler->StartNextSample());
 		//	cout << colObj << endl;
 			//if (colObj.HasNaNs())

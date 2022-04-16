@@ -30,9 +30,6 @@
     <ClCompile Include="include\core\transform.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="include\core\geometry.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="include\core\sphere.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -46,9 +43,6 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="include\core\camera.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="include\core\kdtreeaccel.cpp">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="include\core\sampler.cpp">
@@ -96,6 +90,9 @@
     <ClCompile Include="include\core\imagemap.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\infinite.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rtweekend.h">
@@ -138,9 +135,6 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="include\core\objload.h">
-      <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\kdtreeaccel.h">
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="include\core\sampling.h">
@@ -196,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="include\ext\lodepng.h">
       <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\infinite.h">
+      <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

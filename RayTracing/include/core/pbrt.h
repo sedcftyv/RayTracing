@@ -37,7 +37,7 @@ using std::string;
 #define PBRT_L1_CACHE_LINE_SIZE 64
 #endif
 
-#define PBRT_HAVE__ALIGNED_MALLOC
+//#define PBRT_HAVE__ALIGNED_MALLOC
 
 
 #define PBRT_CONSTEXPR constexpr
@@ -85,32 +85,33 @@ class VisibilityTester;
 class AreaLight;
 class Sampler;
 class TriangleMesh;
-
+class Distribution2D;
 inline void *AllocAligned(size_t size) {
-#if defined(PBRT_HAVE__ALIGNED_MALLOC)
 	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
-#elif defined(PBRT_HAVE_POSIX_MEMALIGN)
-	void *ptr;
-	if (posix_memalign(&ptr, PBRT_L1_CACHE_LINE_SIZE, size) != 0) ptr = nullptr;
-	return ptr;
-#else
-	return memalign(PBRT_L1_CACHE_LINE_SIZE, size);
-#endif
+//#if defined(PBRT_HAVE__ALIGNED_MALLOC)
+//	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
+//#elif defined(PBRT_HAVE_POSIX_MEMALIGN)
+//	void *ptr;
+//	if (posix_memalign(&ptr, PBRT_L1_CACHE_LINE_SIZE, size) != 0) ptr = nullptr;
+//	return ptr;
+//#else
+//	return memalign(PBRT_L1_CACHE_LINE_SIZE, size);
+//#endif
 }
 
-template <typename T>
-T *AllocAligned(size_t count) {
-	return (T *)AllocAligned(count * sizeof(T));
-}
-
-inline void FreeAligned(void *ptr) {
-	if (!ptr) return;
-#if defined(PBRT_HAVE__ALIGNED_MALLOC)
-	_aligned_free(ptr);
-#else
-	free(ptr);
-#endif
-}
+//template <typename T>
+//T *AllocAligned(size_t count) {
+//	return (T *)AllocAligned(count * sizeof(T));
+//}
+//
+//inline void FreeAligned(void *ptr) {
+//	if (!ptr) return;
+//#if defined(PBRT_HAVE__ALIGNED_MALLOC)
+//	_aligned_free(ptr);
+//#else
+//	free(ptr);
+//#endif
+//}
 
 template <typename T, int logBlockSize=2>
 class BlockedArray {
@@ -119,7 +120,8 @@ public:
 	BlockedArray(int uRes, int vRes, const T *d = nullptr)
 		: uRes(uRes), vRes(vRes), uBlocks(RoundUp(uRes) >> logBlockSize) {
 		int nAlloc = RoundUp(uRes) * RoundUp(vRes);
-		data = AllocAligned<T>(nAlloc);
+		//data = AllocAligned<T>(nAlloc);
+		data = new T[nAlloc];
 		for (int i = 0; i < nAlloc; ++i) new (&data[i]) T();
 		if (d)
 			for (int v = 0; v < vRes; ++v)
@@ -133,7 +135,8 @@ public:
 	int vSize() const { return vRes; }
 	~BlockedArray() {
 		for (int i = 0; i < uRes * vRes; ++i) data[i].~T();
-		FreeAligned(data);
+		delete[]data;
+		//FreeAligned(data);
 	}
 	int Block(int a) const { return a >> logBlockSize; }
 	int Offset(int a) const { return (a & (BlockSize() - 1)); }

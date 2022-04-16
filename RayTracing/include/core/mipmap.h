@@ -115,10 +115,11 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 		for (int i = 0; i < nThreads; ++i)
 			resampleBufs.push_back(new T[resPow2[1]]);
 		
+		T *workData = new T[resPow2[1]];
 		//ParallelFor([&](int s) {
 		for (int s = 0; s < resPow2[0]; ++s)
 		{
-			T *workData = resampleBufs[0];
+			//T *workData = resampleBufs[0];
 			for (int t = 0; t < resPow2[1]; ++t) {
 				workData[t] = 0.f;
 				for (int j = 0; j < 4; ++j) {
@@ -136,6 +137,8 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 				resampledImage[t * resPow2[0] + s] = clamp(workData[t]);
 		}
 		//}, resPow2[0], 32);
+		delete[] workData;
+
 		for (auto ptr : resampleBufs) delete[] ptr;
 		resolution = resPow2;
 	}

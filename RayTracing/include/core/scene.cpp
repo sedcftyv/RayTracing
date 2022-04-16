@@ -8,6 +8,8 @@ Scene::Scene(std::shared_ptr<Primitive> aggregate, const std::vector<std::shared
 	worldBound = aggregate->WorldBound();
 	for (const auto &light : lights) {
 		light->Preprocess(*this);
+		if (light->flags & (int)LightFlags::Infinite)
+			infiniteLights.push_back(light);
 	}
 }
 

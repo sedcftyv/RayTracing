@@ -57,7 +57,11 @@ struct BucketInfo {
 	Bounds3f bounds;
 };
 
-BVHAccel::~BVHAccel() { FreeAligned(nodes); }
+BVHAccel::~BVHAccel() { 
+	if (!nodes)
+		delete[]nodes;
+//	FreeAligned(nodes); 
+}
 
 Bounds3f BVHAccel::WorldBound() const {
 	return nodes ? nodes[0].bounds : Bounds3f();

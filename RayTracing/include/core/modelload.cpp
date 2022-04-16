@@ -29,6 +29,7 @@ void ModelLoad::loadModel(std::string path, const Transform &ObjectToWorld)
 {
 	Assimp::Importer import;
 	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	std::cout << import.GetErrorString() << std::endl;;
 	if (!scene || scene->mFlags&AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		return;
 	directory = path.substr(0, path.find_last_of('/'));
@@ -104,32 +105,18 @@ void ModelLoad::buildNoTextureModel(Transform& tri_Object2World, vector<shared_p
 	}
 }
 
-//inline shared_ptr<Material> ModelLoad::getDiffuseMaterial(string filename)
-//{
-//	unique_ptr<TextureMapping2D> Map = make_unique<UVMapping2D>(1.f, 1.f, 0.f, 0.f);
-//	ImageWrap wrapMode = ImageWrap::Repeat;
-//	bool trilerp = false;
-//	Float maxAniso = 8.f;
-//	Float scale = 1.f;
-//	bool gamma = false;
-//	shared_ptr<Texture<Spectrum>> Kt = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(Map), filename, trilerp, maxAniso, wrapMode, scale, gamma);
-//	shared_ptr<Texture<Float>> sigmaRed = make_shared<ConstantTexture<Float>>(0.0f);
-//	shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
-//	return make_shared<MatteMaterial>(Kt, sigmaRed, bumpMap);
-//}
-
-//void ModelLoad::buildTextureModel(Transform& tri_Object2World, vector<shared_ptr<Primitive>>&prims)
-//{
-//	vector<shared_ptr<Shape>> trisObj;
-//	Transform tri_World2Object = Inverse(tri_Object2World);
-//	for (int i = 0; i < meshes.size(); ++i)
-//	{
-//		string filename = directory + "/" + texName[i];
-//		shared_ptr<Material> material = getDiffuseMaterial(filename);
-//		for (int j = 0; j < meshes[i]->nTriangles; ++j)
-//		{
-//			shared_ptr<TriangleMesh> meshPtr = meshes[i];
-//			prims.push_back(make_shared<GeometricPrimitive>(make_shared<Triangle>(&tri_Object2World, &tri_World2Object, false, meshPtr, j), material, nullptr));
-//		}
-//	}
-//}
+void ModelLoad::buildTextureModel(Transform& tri_Object2World, vector<shared_ptr<Primitive>>&prims)
+{
+	vector<shared_ptr<Shape>> trisObj;
+	Transform tri_World2Object = Inverse(tri_Object2World);
+	for (int i = 0; i < meshes.size(); ++i)
+	{
+		string filename = directory + "/" + texName[i];
+		shared_ptr<Material> material = getDiffuseMaterial(filename);
+		for (int j = 0; j < meshes[i]->nTriangles; ++j)
+		{
+			shared_ptr<TriangleMesh> meshPtr = meshes[i];
+			prims.push_back(make_shared<GeometricPrimitive>(make_shared<Triangle>(&tri_Object2World, &tri_World2Object, false, meshPtr, j), material, nullptr));
+		}
+	}
+}

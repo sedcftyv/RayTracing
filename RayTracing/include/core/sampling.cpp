@@ -128,8 +128,8 @@ Distribution2D::Distribution2D(const Float *func, int nu, int nv) {
 	}
 	// Compute marginal sampling distribution p[v]
 	std::vector<Float> marginalFunc;
-	//marginalFunc.reserve(nv);
+	marginalFunc.reserve(nv);
 	for (int v = 0; v < nv; ++v)
 		marginalFunc.push_back(pConditionalV[v]->funcInt);
-	//pMarginal.reset(new Distribution1D(&marginalFunc[0], nv));
+	pMarginal.reset(new Distribution1D(&marginalFunc[0], nv));
 }
