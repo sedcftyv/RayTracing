@@ -118,66 +118,66 @@ Spectrum EstimateDirect(const Interaction &it, const Point2f &uScattering,
 
 			// Add light's contribution to reflected radiance
 			if (!Li.IsBlack()) {
-				if (IsDeltaLight(light.flags))
+				//if (IsDeltaLight(light.flags))
 					Ld += f * Li / lightPdf;
-				else {
-					Float weight =
-						PowerHeuristic(1, lightPdf, 1, scatteringPdf);
-					Ld += f * Li * weight / lightPdf;
-				}
+				//else {
+				//	Float weight =
+				//		PowerHeuristic(1, lightPdf, 1, scatteringPdf);
+				//	Ld += f * Li * weight / lightPdf;
+				//	}
 			}
 		}
 	}
 
-	// Sample BSDF with multiple importance sampling
-	if (!IsDeltaLight(light.flags)) {
-		Spectrum f;
-		bool sampledSpecular = false;
-		if (it.IsSurfaceInteraction()) {
-			// Sample scattered direction for surface interactions
-			BxDFType sampledType;
-			const SurfaceInteraction &isect = (const SurfaceInteraction &)it;
-			f = isect.bsdf->Sample_f(isect.wo, &wi, uScattering, &scatteringPdf,
-				bsdfFlags, &sampledType);
-			f *= AbsDot(wi, isect.shading.n);
-			sampledSpecular = (sampledType & BSDF_SPECULAR) != 0;
-		}
-		//else {
-		//	// Sample scattered direction for medium interactions
-		//	const MediumInteraction &mi = (const MediumInteraction &)it;
-		//	Float p = mi.phase->Sample_p(mi.wo, &wi, uScattering);
-		//	f = Spectrum(p);
-		//	scatteringPdf = p;
-		//}
-		//VLOG(2) << "  BSDF / phase sampling f: " << f << ", scatteringPdf: " << scatteringPdf;
-		if (!f.IsBlack() && scatteringPdf > 0) {
-			// Account for light contributions along sampled direction _wi_
-			Float weight = 1;
-			if (!sampledSpecular) {
-				lightPdf = light.Pdf_Li(it, wi);
-				if (lightPdf == 0) return Ld;
-				weight = PowerHeuristic(1, scatteringPdf, 1, lightPdf);
-			}
+	//// Sample BSDF with multiple importance sampling
+	//if (!IsDeltaLight(light.flags)) {
+	//	Spectrum f;
+	//	bool sampledSpecular = false;
+	//	if (it.IsSurfaceInteraction()) {
+	//		// Sample scattered direction for surface interactions
+	//		BxDFType sampledType;
+	//		const SurfaceInteraction &isect = (const SurfaceInteraction &)it;
+	//		f = isect.bsdf->Sample_f(isect.wo, &wi, uScattering, &scatteringPdf,
+	//			bsdfFlags, &sampledType);
+	//		f *= AbsDot(wi, isect.shading.n);
+	//		sampledSpecular = (sampledType & BSDF_SPECULAR) != 0;
+	//	}
+	//	//else {
+	//	//	// Sample scattered direction for medium interactions
+	//	//	const MediumInteraction &mi = (const MediumInteraction &)it;
+	//	//	Float p = mi.phase->Sample_p(mi.wo, &wi, uScattering);
+	//	//	f = Spectrum(p);
+	//	//	scatteringPdf = p;
+	//	//}
+	//	//VLOG(2) << "  BSDF / phase sampling f: " << f << ", scatteringPdf: " << scatteringPdf;
+	//	if (!f.IsBlack() && scatteringPdf > 0) {
+	//		// Account for light contributions along sampled direction _wi_
+	//		Float weight = 1;
+	//		if (!sampledSpecular) {
+	//			lightPdf = light.Pdf_Li(it, wi);
+	//			if (lightPdf == 0) return Ld;
+	//			weight = PowerHeuristic(1, scatteringPdf, 1, lightPdf);
+	//		}
 
-			// Find intersection and compute transmittance
-			SurfaceInteraction lightIsect;
-			Ray ray = it.SpawnRay(wi);
-			Spectrum Tr(1.f);
-			bool foundSurfaceInteraction =
-				//handleMedia ? scene.IntersectTr(ray, sampler, &lightIsect, &Tr): 
-				scene.Intersect(ray, &lightIsect);
+	//		// Find intersection and compute transmittance
+	//		SurfaceInteraction lightIsect;
+	//		Ray ray = it.SpawnRay(wi);
+	//		Spectrum Tr(1.f);
+	//		bool foundSurfaceInteraction =
+	//			//handleMedia ? scene.IntersectTr(ray, sampler, &lightIsect, &Tr): 
+	//			scene.Intersect(ray, &lightIsect);
 
-			// Add light contribution from material sampling
-			Spectrum Li(0.f);
-			if (foundSurfaceInteraction) {
-				if (lightIsect.primitive->GetAreaLight() == &light)
-					Li = lightIsect.Le(-wi);
-			}
-			else
-				Li = light.Le(ray);
-			if (!Li.IsBlack()) Ld += f * Li * Tr * weight / scatteringPdf;
-		}
-	}
+	//		// Add light contribution from material sampling
+	//		Spectrum Li(0.f);
+	//		if (foundSurfaceInteraction) {
+	//			if (lightIsect.primitive->GetAreaLight() == &light)
+	//				Li = lightIsect.Le(-wi);
+	//		}
+	//		else
+	//			Li = light.Le(ray);
+	//		if (!Li.IsBlack()) Ld += f * Li * Tr * weight / scatteringPdf;
+	//	}
+	//}
 	return Ld;
 }
 
@@ -286,12 +286,12 @@ Spectrum WhittedIntegrator::Li(const Ray &ray, const Scene &scene,
 	SurfaceInteraction isect;
 	if (!scene.Intersect(ray, &isect)) {
 		for (const auto &light : scene.lights) L += light->Le(ray);
-		if (depth == 0)
-		{
-			Spectrum LL;
-			LL[2] = 0.8;
-			return LL;
-		}
+		//if (depth == 0)
+		//{
+		//	Spectrum LL;
+		//	LL[2] = 0.8;
+		//	return LL;
+		//}
 		return L;
 	}
 	//cout << 1 << endl;
@@ -368,10 +368,14 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 			}
 		}
 
+		//if (L.HasNaNs())
+		//{
+		//	cout << L << endl;
+		//}
+
 		// Terminate path if ray escaped or _maxDepth_ was reached
 		if (!foundIntersection || bounces >= maxDepth)
 		{
-			
 			break;
 		}
 
@@ -384,6 +388,10 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 			continue;
 		}
 
+		//if (L.HasNaNs())
+		//{
+		//	cout << L << endl;
+		//}
 		const Distribution1D *distrib = lightDistribution->Lookup(isect.p);
 
 		// Sample illumination from lights to find path contribution.
@@ -395,9 +403,15 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 				sampler, false, distrib);
 			//VLOG(2) << "Sampled direct lighting Ld = " << Ld;
 			if (Ld.IsBlack()) ++zeroRadiancePaths;
+			//cout << Ld << endl;
 			CHECK_GE(Ld.y(), 0.f);
 			L += Ld;
 		}
+
+		//if (L.HasNaNs())
+		//{
+		//	cout << L << endl;
+		//}
 
 		// Sample BSDF to get new path direction
 		Vector3f wo = -ray.d, wi;
@@ -432,7 +446,12 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 			beta /= 1 - q;
 			DCHECK(!std::isinf(beta.y()));
 		}
+		break;
 	}
+	//if (L.HasNaNs())
+	//{
+	//	cout << L << endl;
+	//}
 	//ReportValue(pathLength, bounces);
 	return L;
 }
@@ -461,7 +480,7 @@ inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per
 		<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
 }
 
-void SamplerIntegrator::Render(const Scene &scene) {
+void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_height) {
 
 	//int mw = 400, mh = 235;
 	//Spectrum * mpdata = new Spectrum[mw*mh];
@@ -479,8 +498,8 @@ void SamplerIntegrator::Render(const Scene &scene) {
 
 	Preprocess(scene, *sampler);
 	std::ofstream fout("image.ppm");
-	int image_height = 300;
-	int image_width = 300;
+	//int image_height = 300;
+	//int image_width = 300;
 	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 	Vector3f Light(-2.0,4.0,-3.0);
 	Point3f LightPosition(1.0, 4, -3.0);
@@ -497,6 +516,7 @@ void SamplerIntegrator::Render(const Scene &scene) {
 			//write_color(fout, colObj, 1);
 			//continue;
 
+			//i = 170; j = 60;
 			std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * image_width);
 			Point2i pixel = Point2i(i, j);
 			pixel_sampler->StartPixel(pixel);
@@ -505,6 +525,8 @@ void SamplerIntegrator::Render(const Scene &scene) {
 				Ray r;
 				CameraSample cs;
 				cs = pixel_sampler->GetCameraSample(pixel);
+				//cs.pFilm[0] = i;cs.pFilm[1] = j;
+				//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
 				camera->GenerateRay(cs, &r);
 				//float tHit;
 				SurfaceInteraction  isect;
@@ -512,15 +534,16 @@ void SamplerIntegrator::Render(const Scene &scene) {
 				colObj += Li(r,scene,*pixel_sampler,0);
 
 			} while (pixel_sampler->StartNextSample());
-		//	cout << colObj << endl;
+			//cout << colObj << endl;
 			//if (colObj.HasNaNs())
 			//{
-			//	cout << 1 << endl;
-			//	colObj[0] = colObj[1] = colObj[2] = 1.0f;
+			//	cout << i << ' '<<j<<endl;
+			//	//colObj[0] = colObj[1] = colObj[2] = 1.0f;
 			//}
 			colObj = colObj / pixel_sampler->samplesPerPixel;
 			//colObj = colObj / success;
 			write_color(fout, colObj, 1);
+			//return;
 		}
 	}
 	fout.close();

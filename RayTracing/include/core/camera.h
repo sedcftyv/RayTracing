@@ -38,7 +38,7 @@ public:
 	ProjectiveCamera(const Transform &CameraToWorld,
 		const Transform &CameraToScreen,
 		const Bounds2f &screenWindow,
-		Float lensr, Float focald)
+		Float lensr, Float focald,int image_width=300,int image_height=300)
 		: Camera(CameraToWorld),
 		CameraToScreen(CameraToScreen) {
 		// Initialize depth of field parameters
@@ -48,7 +48,7 @@ public:
 		// Compute projective camera transformations
 
 		// Compute projective camera screen transformations
-		ScreenToRaster = Scale(300, 300, 1) *
+		ScreenToRaster = Scale(image_width, image_height, 1) *
 			Scale(1 / (screenWindow.pMax.x - screenWindow.pMin.x),
 				1 / (screenWindow.pMin.y - screenWindow.pMax.y), 1) *
 			Translate(Vector3f(-screenWindow.pMin.x, -screenWindow.pMax.y, 0));
@@ -85,16 +85,16 @@ OrthographicCamera *CreateOrthographicCamera(const Transform &cam2world);
 class PerspectiveCamera : public ProjectiveCamera {
 public:
 	// PerspectiveCamera Public Methods
-	PerspectiveCamera(const Transform &CameraToWorld, const Bounds2f &screenWindow, Float lensRadius, Float focalDistance, Float fov)
+	PerspectiveCamera(const Transform &CameraToWorld, const Bounds2f &screenWindow, Float lensRadius, Float focalDistance, Float fov,int image_width, int image_height)
 		:ProjectiveCamera(CameraToWorld, Perspective(fov, 1e-2f, 1000.f),
-			screenWindow,lensRadius,focalDistance)
+			screenWindow,lensRadius,focalDistance, image_width, image_height)
 	{
 		// Compute image plane bounds at z=1 for _PerspectiveCamera_
-		Point2i res = Point2i(300, 300);
-		Point3f pMin = RasterToCamera(Point3f(0, 0, 0));
-		Point3f pMax = RasterToCamera(Point3f(res.x, res.y, 0));
-		pMin /= pMin.z;
-		pMax /= pMax.z;
+		//Point2i res = Point2i(300, 300);
+		//Point3f pMin = RasterToCamera(Point3f(0, 0, 0));
+		//Point3f pMax = RasterToCamera(Point3f(res.x, res.y, 0));
+		//pMin /= pMin.z;
+		//pMax /= pMax.z;
 		//A = std::abs((pMax.x - pMin.x) * (pMax.y - pMin.y));
 	}
 	Float GenerateRay(const CameraSample &sample, Ray *) const;
@@ -104,7 +104,7 @@ private:
 	//Float A;
 };
 
-PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world);
+PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world, int image_width, int image_height);
 
 
 

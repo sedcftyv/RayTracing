@@ -1,24 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="ImageTexture&lt;Tmemory, Treturn&gt;">
-    <Position X="5.25" Y="2" Width="1.5" />
+  <Class Name="InfiniteAreaLight">
+    <Position X="6.75" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAACAEAAAAAARQAAAgAAAQAAAAAAAAAACAQAAAA=</HashCode>
-      <FileName>include\core\imagemap.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="ModelLoad">
-    <Position X="7.25" Y="2" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AABAQAAAAAAQAAgAAACAAAIAAAAAAAACAAAAABAAAAA=</HashCode>
-      <FileName>include\core\modelload.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MIPMap&lt;T&gt;">
-    <Position X="3.25" Y="2" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAABCQiAQAAAQQAIWAEAABAAAEBAAAAAAAACAA=</HashCode>
-      <FileName>include\core\mipmap.h</FileName>
+      <HashCode>AAgAAAAIAAAAAICAAAEEAgAAAIAAAAgBAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\infinite.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Microsoft YaHei UI" Size="9" />

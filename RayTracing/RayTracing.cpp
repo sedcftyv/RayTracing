@@ -201,21 +201,21 @@ int main()
 	//std::ofstream fout("image.ppm");
 
 	// Image
-	auto aspect_ratio = 1;
-	int image_width = 300;
-	int samples_per_pixel = 100;
-	int max_depth = 50;
+	//auto aspect_ratio = 1;
+	//int image_width = 300;
+	//int samples_per_pixel = 100;
+	//int max_depth = 50;
 
 	// World
 	//hittable_list world;
 	//Vector3f lookfrom;
 	//Vector3f lookat;
-	auto vfov = 40.0;
-	auto aperture = 0.0;
-	color background(0, 0, 0);
+	//auto vfov = 40.0;
+	//auto aperture = 0.0;
+	//color background(0, 0, 0);
 
 	// Render
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
+	//const int image_height = static_cast<int>(image_width / aspect_ratio);
 	//fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	std::shared_ptr<Scene>worldScene;
@@ -228,16 +228,17 @@ int main()
 	Point3f look(2.5f, 2.5f, 0.0f);
 	Vector3f up(0.0f, 1.0f, 0.0f);
 	//Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
-	Transform lookat = LookAt(Vector3f(0.f, 0.f, 23.0f), Vector3f(0.f, 0.f, 0.0f), up);
+	Transform lookat = LookAt(Vector3f(0.f, 0.f, 21.0f), Vector3f(0.f, 0.f, 0.0f), up);
 	//Transform lookat = LookAt(Vector3f(2.f, 3.f, 3.0f), Vector3f(0.f, 2.f, 0.0f), up);
 	Transform Camera2World = Inverse(lookat);
 
-	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World));
+	int image_width=800, image_height=800;
+	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
 	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
 	Bounds2i pixelBounds;
 	shared_ptr<Integrator>wSI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
 	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(10, cam, ss, pixelBounds,1.f);
 
-	pSI->Render(*worldScene);
+	pSI->Render(*worldScene, image_width, image_height);
 	return 0;
 }

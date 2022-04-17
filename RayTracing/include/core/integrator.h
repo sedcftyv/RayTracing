@@ -21,7 +21,7 @@ class Integrator {
 public:
 	// Integrator Interface
 	virtual ~Integrator();
-	virtual void Render(const Scene &scene) = 0;
+	virtual void Render(const Scene &scene, int image_width, int image_height) = 0;
 };
 
 Spectrum UniformSampleAllLights(const Interaction &it, const Scene &scene, Sampler &sampler,
@@ -46,7 +46,7 @@ public:
 		const Bounds2i &pixelBounds)
 		: camera(camera), sampler(sampler), pixelBounds(pixelBounds) {}
 	virtual void Preprocess(const Scene &scene, Sampler &sampler) {}
-	void Render(const Scene &scene);
+	void Render(const Scene &scene, int image_width, int image_height);
 	virtual Spectrum Li(const Ray &ray, const Scene &scene,
 		Sampler &sampler, int depth = 0) const = 0;
 	Spectrum SpecularReflect(const Ray &ray,
