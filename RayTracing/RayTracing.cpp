@@ -1,16 +1,6 @@
 ﻿#include <iostream>
 #include <fstream>
 #include "rtweekend.h"
-//#include "color.h"
-//#include "ray.h"
-//#include "hittable_list.h"
-//#include "sphere.h"
-//#include "camera.h"
-//#include "material.h"
-//#include "aarect.h"
-//#include "box.h"
-//#include "bvh.h"
-//#include "pdf.h"
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/sphere.h"
@@ -36,10 +26,27 @@ using std::make_unique;
 using std::shared_ptr;
 using std::vector;
 
+
+
+
 void Cornellbox(shared_ptr<Scene> &scene)
 {
-	shared_ptr<Texture<Float>> sigma = make_shared<ConstantTexture<Float>>(0.0f);
 	shared_ptr<Texture<Float>> bump = make_shared<ConstantTexture<Float>>(0.0f);
+	Spectrum purple; purple[0] = 0.35; purple[1] = 0.12; purple[2] = 0.48;
+	shared_ptr<Texture<Spectrum>> plasticKd = make_shared<ConstantTexture<Spectrum>>(purple);
+	shared_ptr<Texture<Spectrum>> plasticKr = make_shared<ConstantTexture<Spectrum>>(Spectrum(1.f)-purple);
+	shared_ptr<Texture<Float>> plasticRoughness = make_shared<ConstantTexture<Float>>(0.1f);
+	shared_ptr<Material> plastic = make_shared<PlasticMaterial>(plasticKd,plasticKr,plasticRoughness,bump,true);
+
+	Spectrum eta(0.18f,0.15f,0.81f);
+	shared_ptr<Texture<Spectrum>> etaM = make_shared<ConstantTexture<Spectrum>>(eta);
+	shared_ptr<Texture<Spectrum>> kM = make_shared<ConstantTexture<Spectrum>>(Spectrum(0.11f,0.11f,0.11f));
+	shared_ptr<Texture<Float>> Roughness = make_shared<ConstantTexture<Float>>(0.2f);
+	shared_ptr<Texture<Float>> RoughnessU = make_shared<ConstantTexture<Float>>(0.2f);
+	shared_ptr<Texture<Float>> RoughnessV = make_shared<ConstantTexture<Float>>(0.2f);
+	shared_ptr<Material> metal = make_shared<MetalMaterial>(etaM, kM, Roughness, RoughnessU, RoughnessV, bump,false);
+
+	shared_ptr<Texture<Float>> sigma = make_shared<ConstantTexture<Float>>(0.0f);
 	Spectrum LightColor(1.0f, 1.0f, 1.0f);
 	Spectrum green(0.0f, 1.0f,0.0f);
 	shared_ptr<Material> m1 = make_shared<MatteMaterial>(make_shared<ConstantTexture<Spectrum>>(LightColor) , sigma, bump);
@@ -97,7 +104,6 @@ void Cornellbox(shared_ptr<Scene> &scene)
 	//string hdrFile = "C:\\glTF-Sample-Models-master\\Walk_Of_Fame\\Mans_Outside_2k.hdr";
 	//shared_ptr<Light>infinityLight = make_shared<InfiniteAreaLight>(InfinityLightToWorld, power, 10, hdrFile);
 	//lights.push_back(infinityLight);
-
 
 	Transform tri_Object2World, tri_World2Object;
 	const int nTrianglesFloor = 10;
@@ -219,20 +225,20 @@ int main()
 	//fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	std::shared_ptr<Scene>worldScene;
-	//Cornellbox(worldScene);
-	MetalRoughSphere(worldScene);
+	Cornellbox(worldScene);
+	//MetalRoughSphere(worldScene);
 	//worldScene = std::make_unique<Scene>(make_unique<BVHAccel>(prims),lights);
 
 	shared_ptr<Camera> cam;
 	Point3f eye(2.5f, 2.5f, 6.0f);
 	Point3f look(2.5f, 2.5f, 0.0f);
 	Vector3f up(0.0f, 1.0f, 0.0f);
-	//Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
-	Transform lookat = LookAt(Vector3f(0.f, 0.f, 21.0f), Vector3f(0.f, 0.f, 0.0f), up);
+	Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
+	//Transform lookat = LookAt(Vector3f(0.f, 0.f, 21.0f), Vector3f(0.f, 0.f, 0.0f), up);
 	//Transform lookat = LookAt(Vector3f(2.f, 3.f, 3.0f), Vector3f(0.f, 2.f, 0.0f), up);
 	Transform Camera2World = Inverse(lookat);
 
-	int image_width=800, image_height=800;
+	int image_width=300, image_height=300;
 	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
 	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
 	Bounds2i pixelBounds;

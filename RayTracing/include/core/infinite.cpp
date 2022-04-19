@@ -1,7 +1,6 @@
 #include "infinite.h"
 #include "sampling.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "rtw_stb_image.h"
 InfiniteAreaLight::InfiniteAreaLight(const Transform &LightToWorld,
 	const Spectrum &L, int nSamples,
 	const std::string &texmap)

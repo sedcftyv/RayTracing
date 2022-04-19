@@ -115,7 +115,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -152,7 +152,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -174,6 +174,7 @@
     <ClCompile Include="include\core\light.cpp" />
     <ClCompile Include="include\core\lightdistrib.cpp" />
     <ClCompile Include="include\core\material.cpp" />
+    <ClCompile Include="include\core\microfacet.cpp" />
     <ClCompile Include="include\core\modelload.cpp" />
     <ClCompile Include="include\core\primitive.cpp" />
     <ClCompile Include="include\core\reflection.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="include\core\light.h" />
     <ClInclude Include="include\core\lightdistrib.h" />
     <ClInclude Include="include\core\material.h" />
+    <ClInclude Include="include\core\microfacet.h" />
     <ClInclude Include="include\core\mipmap.h" />
     <ClInclude Include="include\core\modelload.h" />
     <ClInclude Include="include\core\objload.h" />

@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <thread>
 #include "rtweekend.h"
 #include "integrator.h"
 #include "interaction.h"
@@ -7,8 +8,13 @@
 #include "light.h"
 #include "core/mipmap.h"
 #include "core/spectrum.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 using std::cout;
 using std::endl;
+using std::thread;
 
 static long long totalPaths = 0;
 static long long zeroRadiancePaths = 0;
@@ -446,7 +452,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 			beta /= 1 - q;
 			DCHECK(!std::isinf(beta.y()));
 		}
-		break;
+		//break;
 	}
 	//if (L.HasNaNs())
 	//{
@@ -458,7 +464,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 
 
 
-inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per_pixel) {
+inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w,int h) {
 	auto r = pixel_color[0];
 	auto g = pixel_color[1];
 	auto b = pixel_color[2];
@@ -478,9 +484,16 @@ inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per
 	out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
 		<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
 		<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+
+	data[w*j * 3 + i * 3 + 0] = static_cast<int>(256 * clamp(r, 0.0, 0.999));
+	data[w*j * 3 + i * 3 + 1] = static_cast<int>(256 * clamp(g, 0.0, 0.999));
+	data[w*j * 3 + i * 3 + 2] = static_cast<int>(256 * clamp(b, 0.0, 0.999));
 }
 
+vector<thread>mt;
+
 void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_height) {
+
 
 	//int mw = 400, mh = 235;
 	//Spectrum * mpdata = new Spectrum[mw*mh];
@@ -503,20 +516,13 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 	Vector3f Light(-2.0,4.0,-3.0);
 	Point3f LightPosition(1.0, 4, -3.0);
+	unsigned char *data = new unsigned char[image_height*image_width*3];
 	for (int j = 0; j < image_height; j++) {
 		if (j % 10 == 0)
 			cout << j << endl;
 		for (int i = 0; i < image_width; i++) {
 			//cout << j << ' ' << i << endl;
-			//Spectrum colObj(0.0);
-			//if (i < mw - 1 && j < mh - 1)
-			//	colObj = mp.Lookup(Point2f((i + 1) / (float)image_width, (j + 1) / (float)image_height), 0.0f);
-			//else
-			//	colObj = Spectrum(0.f);
-			//write_color(fout, colObj, 1);
-			//continue;
-
-			//i = 170; j = 60;
+			//i = 160; j = 7;
 			std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * image_width);
 			Point2i pixel = Point2i(i, j);
 			pixel_sampler->StartPixel(pixel);
@@ -534,7 +540,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 				colObj += Li(r,scene,*pixel_sampler,0);
 
 			} while (pixel_sampler->StartNextSample());
-			//cout << colObj << endl;
+			//cout << i<<' '<<j<<' '<<colObj << endl;
 			//if (colObj.HasNaNs())
 			//{
 			//	cout << i << ' '<<j<<endl;
@@ -542,11 +548,12 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 			//}
 			colObj = colObj / pixel_sampler->samplesPerPixel;
 			//colObj = colObj / success;
-			write_color(fout, colObj, 1);
+			write_color(fout, colObj, 1,data,j,i, image_width, image_height);
 			//return;
 		}
 	}
 	fout.close();
+	stbi_write_png("image.png", image_width, image_height, 3, data, 0);
 	std::cerr << "\nDone.\n";
 
 }

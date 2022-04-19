@@ -272,6 +272,11 @@ Vector3<T> Abs(const Vector3<T> &v) {
 }
 
 template <typename T>
+inline Vector3<T> Faceforward(const Vector3<T> &v, const Vector3<T> &v2) {
+	return (Dot(v, v2) < 0.f) ? -v : v;
+}
+
+template <typename T>
 inline Vector3<T>::Vector3(const Point3<T> &p)
 	: x(p.x), y(p.y), z(p.z) {
 	DCHECK(!HasNaNs());

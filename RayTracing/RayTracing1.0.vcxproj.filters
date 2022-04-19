@@ -93,6 +93,9 @@
     <ClCompile Include="include\core\infinite.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="include\core\microfacet.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\rtweekend.h">
@@ -192,6 +195,9 @@
       <Filter>ext</Filter>
     </ClInclude>
     <ClInclude Include="include\core\infinite.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\microfacet.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

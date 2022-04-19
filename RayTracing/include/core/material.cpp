@@ -1,6 +1,7 @@
 #include "material.h"
 #include "reflection.h"
 #include "core/texture.h"
+#include "microfacet.h"
 void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,TransportMode mode,
 	bool allowMultipleLobes) const {
 	
@@ -78,4 +79,53 @@ void GlassMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
 	//				T, distrib, 1.f, eta, mode));
 	//	}
 	//}
+}
+
+void PlasticMaterial::ComputeScatteringFunctions(
+	SurfaceInteraction *si,  TransportMode mode,
+	bool allowMultipleLobes) const {
+	// Perform bump mapping with _bumpMap_, if present
+	//if (bumpMap) Bump(bumpMap, si);
+	si->bsdf = new BSDF(*si);
+	// Initialize diffuse component of plastic material
+	Spectrum kd = Kd->Evaluate(*si).Clamp();
+	if (!kd.IsBlack())
+		si->bsdf->Add(new LambertianReflection(kd));
+
+	// Initialize specular component of plastic material
+	Spectrum ks = Ks->Evaluate(*si).Clamp();
+	if (!ks.IsBlack()) {
+		Fresnel *fresnel = new FresnelDielectric(1.5f, 1.f);
+		// Create microfacet distribution _distrib_ for plastic material
+		Float rough = roughness->Evaluate(*si);
+		if (remapRoughness)
+			rough = TrowbridgeReitzDistribution::RoughnessToAlpha(rough);
+		MicrofacetDistribution *distrib =
+			new TrowbridgeReitzDistribution(rough, rough);
+		BxDF *spec =
+			new MicrofacetReflection(ks, distrib, fresnel);
+		si->bsdf->Add(spec);
+	}
+}
+
+void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
+	TransportMode mode,
+	bool allowMultipleLobes) const {
+	// Perform bump mapping with _bumpMap_, if present
+	//if (bumpMap) Bump(bumpMap, si);
+	si->bsdf = new BSDF(*si);
+
+	Float uRough =
+		uRoughness ? uRoughness->Evaluate(*si) : roughness->Evaluate(*si);
+	Float vRough =
+		vRoughness ? vRoughness->Evaluate(*si) : roughness->Evaluate(*si);
+	if (remapRoughness) {
+		uRough = TrowbridgeReitzDistribution::RoughnessToAlpha(uRough);
+		vRough = TrowbridgeReitzDistribution::RoughnessToAlpha(vRough);
+	}
+	Fresnel *frMf = new FresnelConductor(1., eta->Evaluate(*si),
+		k->Evaluate(*si));
+	MicrofacetDistribution *distrib =
+		new TrowbridgeReitzDistribution(uRough, vRough);
+	si->bsdf->Add(new MicrofacetReflection(1., distrib, frMf));
 }
