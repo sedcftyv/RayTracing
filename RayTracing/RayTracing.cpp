@@ -238,7 +238,7 @@ int main()
 	//Transform lookat = LookAt(Vector3f(2.f, 3.f, 3.0f), Vector3f(0.f, 2.f, 0.0f), up);
 	Transform Camera2World = Inverse(lookat);
 
-	int image_width=300, image_height=300;
+	int image_width=800, image_height=800;
 	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
 	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
 	Bounds2i pixelBounds;
@@ -246,5 +246,6 @@ int main()
 	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(10, cam, ss, pixelBounds,1.f);
 
 	pSI->Render(*worldScene, image_width, image_height);
+	//cout << worldScene.use_count() << endl;
 	return 0;
 }

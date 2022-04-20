@@ -55,6 +55,7 @@ public:
 	Spectrum SpecularTransmit(const Ray &ray,
 		const SurfaceInteraction &isect,
 		const Scene &scene, Sampler &sampler, int depth) const;
+	void render_pixel(int nowpos);
 
 protected:
 	// SamplerIntegrator Protected Data

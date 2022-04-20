@@ -1,6 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <mutex>
+#include <atomic>
 #include "rtweekend.h"
 #include "integrator.h"
 #include "interaction.h"
@@ -15,7 +17,7 @@
 using std::cout;
 using std::endl;
 using std::thread;
-
+using std::mutex;
 static long long totalPaths = 0;
 static long long zeroRadiancePaths = 0;
 
@@ -464,7 +466,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 
 
 
-inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w,int h) {
+inline void write_color(Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w) {
 	auto r = pixel_color[0];
 	auto g = pixel_color[1];
 	auto b = pixel_color[2];
@@ -481,79 +483,121 @@ inline void write_color(std::ostream &out, Spectrum pixel_color, int samples_per
 	b = sqrt(scale * b);
 
 	// Write the translated [0,255] value of each color component.
-	out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
-		<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-		<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+	//out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
+	//	<< static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
+	//	<< static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
 
 	data[w*j * 3 + i * 3 + 0] = static_cast<int>(256 * clamp(r, 0.0, 0.999));
 	data[w*j * 3 + i * 3 + 1] = static_cast<int>(256 * clamp(g, 0.0, 0.999));
 	data[w*j * 3 + i * 3 + 2] = static_cast<int>(256 * clamp(b, 0.0, 0.999));
 }
 
-vector<thread>mt;
+unsigned char *data;
+vector<thread>pool;
+//mutex mt;
+//std::condition_variable cv;
+int thread_count=1;
+int iw, ih;
+int maxpos;
+int now;
+mutex out_mt;
+vector<int>test;
+const Scene *sc;
+void SamplerIntegrator::render_pixel(int nowpos)
+{
+	//{
+	//std::unique_lock<mutex> loc(out_mt);
+	//test[nowpos]++;
+	//}
+		int j = nowpos / iw, i = nowpos - j * iw;
+		if (i == iw - 1 && j % 10 == 0)
+			cout << j << endl;
+		//cout << j << ' ' << i << endl;
+		//i = 160; j = 7;
+		std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * iw);
+		Point2i pixel = Point2i(i, j);
+		pixel_sampler->StartPixel(pixel);
+		Spectrum colObj(0.0);
+		do {
+			Ray r;
+			CameraSample cs;
+			cs = pixel_sampler->GetCameraSample(pixel);
+			//cs.pFilm[0] = i;cs.pFilm[1] = j;
+			//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
+			camera->GenerateRay(cs, &r);
+			//float tHit;
+			SurfaceInteraction  isect;
+			colObj += Li(r, *sc, *pixel_sampler, 0);
+
+		} while (pixel_sampler->StartNextSample());
+		//cout << i<<' '<<j<<' '<<colObj << endl;
+		//if (colObj.HasNaNs())
+		//{
+		//	cout << i << ' '<<j<<endl;
+		//	//colObj[0] = colObj[1] = colObj[2] = 1.0f;
+		//}
+		colObj = colObj / pixel_sampler->samplesPerPixel;
+		write_color(colObj, 1, data, j, i, iw);
+}
 
 void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_height) {
-
-
-	//int mw = 400, mh = 235;
-	//Spectrum * mpdata = new Spectrum[mw*mh];
-	//for(int j=0;j<mh;++j)
-	//	for (int i = 0; i < mw; ++i)
-	//	{
-	//		int offset = i + j * mw;
-	//		Spectrum s;
-	//		s[0] = i / (float)800;
-	//		s[1] = j / (float)800;
-	//		s[2] = 0.4f;
-	//		mpdata[offset] = s;
-	//	}
-	//MIPMap<Spectrum>mp(Point2i(mw, mh), mpdata, true);
-
+	iw = image_width;
+	ih = image_height;
+	sc = &scene;
 	Preprocess(scene, *sampler);
-	std::ofstream fout("image.ppm");
+	//std::ofstream fout("image.ppm");
 	//int image_height = 300;
 	//int image_width = 300;
-	fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-	Vector3f Light(-2.0,4.0,-3.0);
-	Point3f LightPosition(1.0, 4, -3.0);
-	unsigned char *data = new unsigned char[image_height*image_width*3];
-	for (int j = 0; j < image_height; j++) {
-		if (j % 10 == 0)
-			cout << j << endl;
-		for (int i = 0; i < image_width; i++) {
-			//cout << j << ' ' << i << endl;
-			//i = 160; j = 7;
-			std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * image_width);
-			Point2i pixel = Point2i(i, j);
-			pixel_sampler->StartPixel(pixel);
-			Spectrum colObj(0.0);
-			do {
-				Ray r;
-				CameraSample cs;
-				cs = pixel_sampler->GetCameraSample(pixel);
-				//cs.pFilm[0] = i;cs.pFilm[1] = j;
-				//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
-				camera->GenerateRay(cs, &r);
-				//float tHit;
-				SurfaceInteraction  isect;
-				//r.d = Vector3f(0.663268, 0.273197, -0.696735);
-				colObj += Li(r,scene,*pixel_sampler,0);
-
-			} while (pixel_sampler->StartNextSample());
-			//cout << i<<' '<<j<<' '<<colObj << endl;
-			//if (colObj.HasNaNs())
+	//fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+	data = new unsigned char[image_height*image_width*3];
+	maxpos = image_height * image_width;
+	//test.resize(maxpos + 10);
+	for (int i = 1; i <= thread_count-1; ++i)
+	{
+		pool.push_back(thread([&] {
 			//{
-			//	cout << i << ' '<<j<<endl;
-			//	//colObj[0] = colObj[1] = colObj[2] = 1.0f;
+			//	std::unique_lock<mutex> loc(mt);
+			//	thread_count--;
+			//	if (!thread_count)
+			//		cv.notify_all();
+			//	else
+			//		cv.wait(loc);
 			//}
-			colObj = colObj / pixel_sampler->samplesPerPixel;
-			//colObj = colObj / success;
-			write_color(fout, colObj, 1,data,j,i, image_width, image_height);
-			//return;
+			{
+				std::unique_lock<mutex> loc(out_mt);
+				while (now < maxpos)
+				{
+					int tmp = now;
+					now++;
+					loc.unlock();
+					render_pixel(tmp);
+					loc.lock();
+				}
+			}
+		}));
+	}
+	//{
+	//	std::unique_lock<mutex> loc(mt);
+	//	thread_count--;
+	//	if (!thread_count)
+	//		cv.notify_all();
+	//	else
+	//		cv.wait(loc);
+	//}
+	{
+		std::unique_lock<mutex> loc(out_mt);
+		while (now < maxpos)
+		{
+			int tmp = now;
+			now++;
+			loc.unlock();
+			render_pixel(tmp);
+			loc.lock();
 		}
 	}
-	fout.close();
+	for (int i = 0; i < pool.size(); ++i)
+		pool[i].join();
 	stbi_write_png("image.png", image_width, image_height, 3, data, 0);
 	std::cerr << "\nDone.\n";
-
+	return;
 }
