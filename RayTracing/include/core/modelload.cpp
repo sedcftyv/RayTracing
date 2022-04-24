@@ -11,15 +11,8 @@ void ModelLoad::processNode(aiNode *node, const aiScene *scene, const Transform 
 		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(processMesh(mesh, scene, ObjectToWorld));
 
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-		for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
-		{
-			aiString str;
-			material->GetTexture(aiTextureType_DIFFUSE, i, &str);
-			string filename = str.C_Str();
-			texName.push_back(filename);
-		}
 	}
+
 	for (unsigned int i = 0; i < node->mNumChildren; ++i)
 		processNode(node->mChildren[i], scene, ObjectToWorld);
 
@@ -28,11 +21,14 @@ void ModelLoad::processNode(aiNode *node, const aiScene *scene, const Transform 
 void ModelLoad::loadModel(std::string path, const Transform &ObjectToWorld)
 {
 	Assimp::Importer import;
-	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
-	std::cout << import.GetErrorString() << std::endl;;
+	const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs| aiProcess_MakeLeftHanded);
+	//std::cout << import.GetErrorString() << std::endl;;
 	if (!scene || scene->mFlags&AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 		return;
-	directory = path.substr(0, path.find_last_of('/'));
+	}
+	directory = path.substr(0, path.find_last_of('\\'));
 	processNode(scene->mRootNode, scene, ObjectToWorld);
 }
 
@@ -86,6 +82,33 @@ shared_ptr<TriangleMesh> ModelLoad::processMesh(aiMesh *mesh, const aiScene *sce
 	delete[] S;
 	delete[] N;
 	delete[] uv;
+
+	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	int count = material->GetTextureCount(aiTextureType_DIFFUSE);
+	if (count == 0)
+		diffTexName.push_back("");
+	else {
+		for (unsigned int i = 0; i < count; ++i)
+		{
+			aiString str;
+			material->GetTexture(aiTextureType_DIFFUSE, i, &str);
+			string filename = str.C_Str();
+			diffTexName.push_back(filename);
+		}
+	}
+	count = material->GetTextureCount(aiTextureType_UNKNOWN);
+	if (count == 0)
+		specTexName.push_back("");
+	else {
+		for (unsigned int i = 0; i < count; ++i)
+		{
+			aiString str;
+			material->GetTexture(aiTextureType_UNKNOWN, i, &str);
+			string filename = str.C_Str();
+			specTexName.push_back(filename);
+		}
+	}
+
 	return a;
 }
 
@@ -111,12 +134,16 @@ void ModelLoad::buildTextureModel(Transform& tri_Object2World, vector<shared_ptr
 	Transform tri_World2Object = Inverse(tri_Object2World);
 	for (int i = 0; i < meshes.size(); ++i)
 	{
-		string filename = directory + "/" + texName[i];
-		shared_ptr<Material> material = getDiffuseMaterial(filename);
+		string filename1 = directory + "\\" + diffTexName[i];
+		string filename2 = directory + "\\" + specTexName[i];
+		shared_ptr<Material> material = getDiffuseMaterial(filename1);
+		//shared_ptr<Material> material = getPlasticMaterial(filename1, filename2);
 		for (int j = 0; j < meshes[i]->nTriangles; ++j)
 		{
 			shared_ptr<TriangleMesh> meshPtr = meshes[i];
 			prims.push_back(make_shared<GeometricPrimitive>(make_shared<Triangle>(&tri_Object2World, &tri_World2Object, false, meshPtr, j), material, nullptr));
 		}
+		//break;
 	}
 }
+

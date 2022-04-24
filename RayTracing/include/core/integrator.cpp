@@ -496,19 +496,14 @@ unsigned char *data;
 vector<thread>pool;
 //mutex mt;
 //std::condition_variable cv;
-int thread_count=1;
+int thread_count=8;
 int iw, ih;
 int maxpos;
 int now;
 mutex out_mt;
-vector<int>test;
 const Scene *sc;
 void SamplerIntegrator::render_pixel(int nowpos)
 {
-	//{
-	//std::unique_lock<mutex> loc(out_mt);
-	//test[nowpos]++;
-	//}
 		int j = nowpos / iw, i = nowpos - j * iw;
 		if (i == iw - 1 && j % 10 == 0)
 			cout << j << endl;
@@ -545,24 +540,13 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 	ih = image_height;
 	sc = &scene;
 	Preprocess(scene, *sampler);
-	//std::ofstream fout("image.ppm");
 	//int image_height = 300;
 	//int image_width = 300;
-	//fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 	data = new unsigned char[image_height*image_width*3];
 	maxpos = image_height * image_width;
-	//test.resize(maxpos + 10);
 	for (int i = 1; i <= thread_count-1; ++i)
 	{
 		pool.push_back(thread([&] {
-			//{
-			//	std::unique_lock<mutex> loc(mt);
-			//	thread_count--;
-			//	if (!thread_count)
-			//		cv.notify_all();
-			//	else
-			//		cv.wait(loc);
-			//}
 			{
 				std::unique_lock<mutex> loc(out_mt);
 				while (now < maxpos)
@@ -576,14 +560,6 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 			}
 		}));
 	}
-	//{
-	//	std::unique_lock<mutex> loc(mt);
-	//	thread_count--;
-	//	if (!thread_count)
-	//		cv.notify_all();
-	//	else
-	//		cv.wait(loc);
-	//}
 	{
 		std::unique_lock<mutex> loc(out_mt);
 		while (now < maxpos)

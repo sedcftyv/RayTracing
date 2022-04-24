@@ -26,10 +26,7 @@ using std::make_unique;
 using std::shared_ptr;
 using std::vector;
 
-
-
-
-void Cornellbox(shared_ptr<Scene> &scene)
+void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 {
 	shared_ptr<Texture<Float>> bump = make_shared<ConstantTexture<Float>>(0.0f);
 	Spectrum purple; purple[0] = 0.35; purple[1] = 0.12; purple[2] = 0.48;
@@ -73,7 +70,7 @@ void Cornellbox(shared_ptr<Scene> &scene)
 	tri_World2ObjectTri = Inverse(tri_Object2WorldTri);
 	std::vector<std::shared_ptr<Shape>> tris = CreateTriangleMesh(&tri_Object2WorldTri, &tri_World2ObjectTri, false, nTriangles, vertexIndices, nVertices, P, nullptr, nullptr, nullptr, nullptr);
 	for (int i = 0; i < nTriangles; ++i)
-		prims.push_back(make_shared<GeometricPrimitive>(tris[i], mgreen, area));
+		prims.push_back(make_shared<GeometricPrimitive>(tris[i], metal, area));
 	delete []P;
 	delete []vertexIndices;
 
@@ -153,9 +150,14 @@ void Cornellbox(shared_ptr<Scene> &scene)
 
 	scene=make_shared<Scene>(make_shared<BVHAccel>(prims), lights);
 
+	Point3f eye(2.5f, 2.5f, 6.0f);
+	Point3f look(2.5f, 2.5f, 0.0f);
+	Vector3f up(0.0f, 1.0f, 0.0f);
+	lookat = LookAt(Vector3f(eye), Vector3f(look), up);
+
 }
 
-void MetalRoughSphere(shared_ptr<Scene> &scene)
+void MetalRoughSphere(shared_ptr<Scene> &scene,Transform &lookat)
 {
 	Spectrum LightColor(1.0f, 1.0f, 1.0f);
 	shared_ptr<Texture<Float>> sigma = make_shared<ConstantTexture<Float>>(0.0f);
@@ -172,25 +174,7 @@ void MetalRoughSphere(shared_ptr<Scene> &scene)
 	shared_ptr<Light>infinityLight = make_shared<InfiniteAreaLight>(InfinityLightToWorld,power,10,hdrFile);
 	lights.push_back(infinityLight);
 
-	//const float yPos_AreaLight = -16;
-	//float len = 10;
-	//int nTrianglesAreaLight = 2;
-	//int vertexIndicesAreaLight[6] = { 0,1,2,3,4,5 };
-	//int nVerticesAreaLight = 6;
-	//Point3f P_AreaLight[6] = {
-	//		Point3f(-len,yPos_AreaLight,len),Point3f(-len,yPos_AreaLight,-len),Point3f(len,yPos_AreaLight,len),
-	//		Point3f(len,yPos_AreaLight,len),Point3f(-len,yPos_AreaLight,-len),Point3f(len,yPos_AreaLight,-len) };
-	//Transform tri_Object2World_AreaLight;
-	//tri_Object2World_AreaLight = Translate(Vector3f(2.5f, 0.0f, 2.5f))*tri_Object2World_AreaLight;
-	//Transform tri_World2Object_AreaLight = Inverse(tri_Object2World_AreaLight);
-	//std::vector<std::shared_ptr<Shape>> meshAreaLight = CreateTriangleMesh(&tri_Object2World_AreaLight, &tri_World2Object_AreaLight, false, nTrianglesAreaLight, vertexIndicesAreaLight, nVerticesAreaLight, P_AreaLight, nullptr, nullptr, nullptr, nullptr);
-	//for (int i = 0; i < nTrianglesAreaLight; ++i)
-	//{
-	//	area = make_shared<DiffuseAreaLight>(tri_Object2World_AreaLight, Spectrum(7.f), 5, meshAreaLight[i], true);
-	//	lights.push_back(area);
-	//	prims.push_back(make_shared<GeometricPrimitive>(meshAreaLight[i], m1, area));
-	//}
-	Transform tri_ObjectWorldModel = RotateX(90);
+	Transform tri_ObjectWorldModel = RotateZ(180)*RotateY(180)*RotateX(-90);
 	//Transform tri_ObjectWorldModel = Translate(Vector3f(0.f,2.f,0.f))*RotateY(-30)*Scale(3, 3, 3);
 	ModelLoad ML;
 	string metalroughsphere = "C:\\glTF-Sample-Models-master\\2.0\\MetalRoughSpheres\\glTF\\MetalRoughSpheres.gltf";
@@ -198,49 +182,30 @@ void MetalRoughSphere(shared_ptr<Scene> &scene)
 	ML.loadModel(metalroughsphere, tri_ObjectWorldModel);
 	Spectrum black(1.f, 1.f, 1.f);
 	shared_ptr<Material> mblack = make_shared<MatteMaterial>(make_shared<ConstantTexture<Spectrum>>(black), sigma, bump);
-	ML.buildNoTextureModel(tri_ObjectWorldModel, prims, mblack);
+	//ML.buildNoTextureModel(tri_ObjectWorldModel, prims, mblack);
+	ML.buildTextureModel(tri_ObjectWorldModel, prims);
 	scene = make_shared<Scene>(make_shared<BVHAccel>(prims), lights);
+
+	Vector3f up(0.0f, 1.0f, 0.0f);
+	//lookat = LookAt(Vector3f(2.f, 3.f, 3.0f), Vector3f(0.f, 2.f, 0.0f), up);
+	lookat = LookAt(Vector3f(0.f, 0.f, 24.0f), Vector3f(0.f, 0.f, 0.0f), up);
+	//lookat = LookAt(Vector3f(0.f, 0.f, -24.0f), Vector3f(0.f, 0.f, 0.0f), up);
 }
 
 int main()
 {
-	//std::ofstream fout("image.ppm");
-
-	// Image
-	//auto aspect_ratio = 1;
-	//int image_width = 300;
-	//int samples_per_pixel = 100;
-	//int max_depth = 50;
-
-	// World
-	//hittable_list world;
-	//Vector3f lookfrom;
-	//Vector3f lookat;
-	//auto vfov = 40.0;
-	//auto aperture = 0.0;
-	//color background(0, 0, 0);
-
-	// Render
-	//const int image_height = static_cast<int>(image_width / aspect_ratio);
-	//fout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
 	std::shared_ptr<Scene>worldScene;
-	Cornellbox(worldScene);
-	//MetalRoughSphere(worldScene);
-	//worldScene = std::make_unique<Scene>(make_unique<BVHAccel>(prims),lights);
+	Transform lookat;
+	Cornellbox(worldScene, lookat);
+	//MetalRoughSphere(worldScene,lookat);
 
-	shared_ptr<Camera> cam;
-	Point3f eye(2.5f, 2.5f, 6.0f);
-	Point3f look(2.5f, 2.5f, 0.0f);
-	Vector3f up(0.0f, 1.0f, 0.0f);
-	Transform lookat = LookAt(Vector3f(eye), Vector3f(look), up);
-	//Transform lookat = LookAt(Vector3f(0.f, 0.f, 21.0f), Vector3f(0.f, 0.f, 0.0f), up);
-	//Transform lookat = LookAt(Vector3f(2.f, 3.f, 3.0f), Vector3f(0.f, 2.f, 0.0f), up);
 	Transform Camera2World = Inverse(lookat);
 
-	int image_width=800, image_height=800;
-	cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
-	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
+	int image_width=1920, image_height=1080;
+	image_width = 800, image_height = 800;
+	shared_ptr<Camera> cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
+	
+	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(32,32,true,1);
 	Bounds2i pixelBounds;
 	shared_ptr<Integrator>wSI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
 	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(10, cam, ss, pixelBounds,1.f);

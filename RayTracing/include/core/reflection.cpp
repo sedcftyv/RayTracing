@@ -156,7 +156,6 @@ Spectrum LambertianReflection::f(const Vector3f &wo, const Vector3f &wi) const {
 }
 
 
-
 // BSDF Method Definitions
 Spectrum BSDF::f(const Vector3f &woW, const Vector3f &wiW,
 	BxDFType flags) const {

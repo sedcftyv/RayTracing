@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="InfiniteAreaLight">
-    <Position X="6.75" Y="2" Width="1.5" />
+  <Class Name="ModelLoad">
+    <Position X="2.5" Y="2" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAgAAAAIAAAAAICAAAEEAgAAAIAAAAgBAAAAAAAAAAA=</HashCode>
-      <FileName>include\core\infinite.h</FileName>
+      <HashCode>AABAQAAAAAAQAAwAAACAAAIAAAAAAAACAAAAABAAAgA=</HashCode>
+      <FileName>include\core\modelload.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Microsoft YaHei UI" Size="9" />

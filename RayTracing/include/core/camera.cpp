@@ -66,7 +66,7 @@ PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world,int image_
 {
 	Float lensradius = 0.0f;
 	Float focaldistance = 0.0f;
-	Float frame = 300.f/300.f;
+	Float frame = (float)image_width / (float)image_height;
 	Bounds2f screen;
 	if (frame > 1.f) {
 		screen.pMin.x = -frame;

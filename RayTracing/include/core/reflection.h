@@ -187,7 +187,6 @@ public:
 	Float Pdf(const Vector3f &wo, const Vector3f &wi,
 		BxDFType flags = BSDF_ALL) const;
 	//std::string ToString() const;
-
 	// BSDF Public Data
 	const Float eta;
 
@@ -295,6 +294,13 @@ public:
 		R(R),
 		distribution(distribution),
 		fresnel(fresnel) {}
+	~MicrofacetReflection()
+	{
+		if (fresnel != nullptr)
+			delete fresnel;
+		if (distribution != nullptr)
+			delete distribution;
+	}
 	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
 	Spectrum Sample_f(const Vector3f &wo, Vector3f *wi, const Point2f &u,
 		Float *pdf, BxDFType *sampledType) const;
