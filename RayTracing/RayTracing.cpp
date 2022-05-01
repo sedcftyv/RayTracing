@@ -34,6 +34,10 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	shared_ptr<Texture<Spectrum>> plasticKr = make_shared<ConstantTexture<Spectrum>>(Spectrum(1.f)-purple);
 	shared_ptr<Texture<Float>> plasticRoughness = make_shared<ConstantTexture<Float>>(0.1f);
 	shared_ptr<Material> plastic = make_shared<PlasticMaterial>(plasticKd,plasticKr,plasticRoughness,bump,true);
+	
+	shared_ptr<Texture<Spectrum>> mr = make_shared<ConstantTexture<Spectrum>>(Spectrum(0.f,0.0f,1.0f));
+	shared_ptr<Texture<Spectrum>> c = make_shared<ConstantTexture<Spectrum>>(Spectrum(0.5f,0.5f,0.5f));
+	shared_ptr<Material> MR = make_shared<MetalRoughnessMaterial>(c, mr);
 
 	Spectrum eta(0.18f,0.15f,0.81f);
 	shared_ptr<Texture<Spectrum>> etaM = make_shared<ConstantTexture<Spectrum>>(eta);
@@ -70,7 +74,7 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	tri_World2ObjectTri = Inverse(tri_Object2WorldTri);
 	std::vector<std::shared_ptr<Shape>> tris = CreateTriangleMesh(&tri_Object2WorldTri, &tri_World2ObjectTri, false, nTriangles, vertexIndices, nVertices, P, nullptr, nullptr, nullptr, nullptr);
 	for (int i = 0; i < nTriangles; ++i)
-		prims.push_back(make_shared<GeometricPrimitive>(tris[i], metal, area));
+		prims.push_back(make_shared<GeometricPrimitive>(tris[i], MR, area));
 	delete []P;
 	delete []vertexIndices;
 
@@ -147,7 +151,6 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 			prims.push_back(make_shared<GeometricPrimitive>(meshFloor[i], mblue, area));
 	}
 
-
 	scene=make_shared<Scene>(make_shared<BVHAccel>(prims), lights);
 
 	Point3f eye(2.5f, 2.5f, 6.0f);
@@ -201,11 +204,11 @@ int main()
 
 	Transform Camera2World = Inverse(lookat);
 
-	int image_width=1920, image_height=1080;
+	int image_width= 1440, image_height= 1440;
 	image_width = 800, image_height = 800;
 	shared_ptr<Camera> cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, image_width, image_height));
 	
-	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(32,32,true,1);
+	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(8,8,true,1);
 	Bounds2i pixelBounds;
 	shared_ptr<Integrator>wSI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
 	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(10, cam, ss, pixelBounds,1.f);

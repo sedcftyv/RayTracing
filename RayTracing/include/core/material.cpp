@@ -98,11 +98,14 @@ void PlasticMaterial::ComputeScatteringFunctions(
 		Fresnel *fresnel = new FresnelDielectric(1.5f, 1.f);
 		// Create microfacet distribution _distrib_ for plastic material
 		Float rough = roughness->Evaluate(*si);
+		//Spectrum tmp = roughness->Evaluate(*si).Clamp();
+		//Float rough = 0.f;
 		if (remapRoughness)
 			rough = TrowbridgeReitzDistribution::RoughnessToAlpha(rough);
 		MicrofacetDistribution *distrib =
 			new TrowbridgeReitzDistribution(rough, rough);
 		BxDF *spec =
+			//new MicrofacetReflection(1., distrib, fresnel);
 			new MicrofacetReflection(ks, distrib, fresnel);
 		si->bsdf->Add(spec);
 	}
@@ -128,4 +131,28 @@ void MetalMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
 	MicrofacetDistribution *distrib =
 		new TrowbridgeReitzDistribution(uRough, vRough);
 	si->bsdf->Add(new MicrofacetReflection(1., distrib, frMf));
+}
+
+void MetalRoughnessMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
+	TransportMode mode,bool allowMultipleLobes) const {
+	// Perform bump mapping with _bumpMap_, if present
+	//if (bumpMap) Bump(bumpMap, si);
+	si->bsdf = new BSDF(*si);
+
+	Spectrum c = base_color->Evaluate(*si).Clamp();
+	if (metalroughness == nullptr)
+	{
+		si->bsdf->Add(new LambertianReflection(c));
+	}
+	else
+	{
+		Spectrum tmp = metalroughness->Evaluate(*si).Clamp();
+		Float metallic = tmp[2], roughness = std::max(0.05f,tmp[1]);
+		//metallic = 1.0; roughness = 0.05;
+		MicrofacetDistribution *distrib =
+			new TrowbridgeReitzDistribution(roughness, roughness);
+			//new BeckmannDistribution(roughness, roughness);
+			//new PBRDistribution(roughness,si->n);
+		si->bsdf->Add(new MetalRoughnessReflection(c, metallic, roughness, distrib));
+	}
 }

@@ -128,6 +128,7 @@ Spectrum EstimateDirect(const Interaction &it, const Point2f &uScattering,
 			if (!Li.IsBlack()) {
 				//if (IsDeltaLight(light.flags))
 					Ld += f * Li / lightPdf;
+					//cout << f << ' ' << Li << ' ' << lightPdf << endl;
 				//else {
 				//	Float weight =
 				//		PowerHeuristic(1, lightPdf, 1, scatteringPdf);
@@ -353,7 +354,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 	Float etaScale = 1;
 
 	for (bounces = 0;; ++bounces) {
-		//cout << bounces << endl;
+		//cout << L<<' '<<bounces << endl;
 		// Find next path vertex and accumulate contribution
 		//VLOG(2) << "Path tracer bounce " << bounces << ", current L = " << L
 		//	<< ", beta = " << beta;
@@ -409,6 +410,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 			++totalPaths;
 			Spectrum Ld = beta * UniformSampleOneLight(isect, scene,
 				sampler, false, distrib);
+			//cout << beta << endl;
 			//VLOG(2) << "Sampled direct lighting Ld = " << Ld;
 			if (Ld.IsBlack()) ++zeroRadiancePaths;
 			//cout << Ld << endl;
@@ -443,6 +445,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 		}
 		ray = isect.SpawnRay(wi);
 
+		//cout << L << endl;
 		// Account for subsurface scattering, if applicable
 
 		// Possibly terminate the path with Russian roulette.
@@ -461,10 +464,9 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 	//	cout << L << endl;
 	//}
 	//ReportValue(pathLength, bounces);
+	//cout << L << endl;
 	return L;
 }
-
-
 
 inline void write_color(Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w) {
 	auto r = pixel_color[0];
@@ -491,7 +493,6 @@ inline void write_color(Spectrum pixel_color, int samples_per_pixel, unsigned ch
 	data[w*j * 3 + i * 3 + 1] = static_cast<int>(256 * clamp(g, 0.0, 0.999));
 	data[w*j * 3 + i * 3 + 2] = static_cast<int>(256 * clamp(b, 0.0, 0.999));
 }
-
 unsigned char *data;
 vector<thread>pool;
 //mutex mt;
@@ -504,46 +505,89 @@ mutex out_mt;
 const Scene *sc;
 void SamplerIntegrator::render_pixel(int nowpos)
 {
-		int j = nowpos / iw, i = nowpos - j * iw;
-		if (i == iw - 1 && j % 10 == 0)
-			cout << j << endl;
-		//cout << j << ' ' << i << endl;
-		//i = 160; j = 7;
-		std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * iw);
-		Point2i pixel = Point2i(i, j);
-		pixel_sampler->StartPixel(pixel);
-		Spectrum colObj(0.0);
-		do {
-			Ray r;
-			CameraSample cs;
-			cs = pixel_sampler->GetCameraSample(pixel);
-			//cs.pFilm[0] = i;cs.pFilm[1] = j;
-			//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
-			camera->GenerateRay(cs, &r);
-			//float tHit;
-			SurfaceInteraction  isect;
-			colObj += Li(r, *sc, *pixel_sampler, 0);
+	int j = nowpos / iw, i = nowpos - j * iw;
+	if (i == iw - 1 && j % 10 == 0)
+		cout << j << endl;
+	//cout << j << ' ' << i << endl;
+	//i = 90; j = 90;
+	std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * iw);
+	Point2i pixel = Point2i(i, j);
+	pixel_sampler->StartPixel(pixel);
+	Spectrum colObj(0.0);
+	do {
+		Ray r;
+		CameraSample cs;
+		cs = pixel_sampler->GetCameraSample(pixel);
+		//cs.pFilm[0] = i; cs.pFilm[1] = j;
+		//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
+		camera->GenerateRay(cs, &r);
+		//float tHit;
+		SurfaceInteraction  isect;
+		colObj += Li(r, *sc, *pixel_sampler, 0);
 
-		} while (pixel_sampler->StartNextSample());
-		//cout << i<<' '<<j<<' '<<colObj << endl;
-		//if (colObj.HasNaNs())
-		//{
-		//	cout << i << ' '<<j<<endl;
-		//	//colObj[0] = colObj[1] = colObj[2] = 1.0f;
-		//}
-		colObj = colObj / pixel_sampler->samplesPerPixel;
-		write_color(colObj, 1, data, j, i, iw);
+	} while (pixel_sampler->StartNextSample());
+	//cout << i<<' '<<j<<' '<<colObj << endl;
+	if (colObj.HasNaNs())
+	{
+		cout << i << ' ' << j << ' ' << colObj << endl;
+		//colObj[0] = colObj[1] = colObj[2] = 1.0f;
+	}
+	colObj = colObj / pixel_sampler->samplesPerPixel;
+	//cout << i << ' ' << j << ' ' << colObj << endl;
+	write_color(colObj, 1, data, j, i, iw);
 }
-
 void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_height) {
-	iw = image_width;
-	ih = image_height;
+	iw = image_width;ih = image_height;
 	sc = &scene;
 	Preprocess(scene, *sampler);
-	//int image_height = 300;
-	//int image_width = 300;
 	data = new unsigned char[image_height*image_width*3];
 	maxpos = image_height * image_width;
+	if (thread_count == 1)
+	{
+		for (int j = 0; j < image_height; j++) {
+			if (j % 10 == 0)
+				cout << j << endl;
+			for (int i = 0; i < image_width; i++) {
+				//cout << j << ' ' << i << endl;
+				//i = 90; j = 90;
+				if (j < 85 || j>90 || i < 86 || i>90)
+				{
+					Spectrum colObj(1.0f,0.0f,0.0f);
+					write_color(colObj, 1, data, j, i, iw);
+					continue;
+				}
+				std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * iw);
+				Point2i pixel = Point2i(i, j);
+				pixel_sampler->StartPixel(pixel);
+				Spectrum colObj(0.0);
+				do {
+					Ray r;
+					CameraSample cs;
+					cs = pixel_sampler->GetCameraSample(pixel);
+					cs.pFilm[0] = i; cs.pFilm[1] = j;
+					//cout << i << ' ' << j << ' ' << ' '<<cs.pFilm[0] << ' '<< cs.pFilm[1]<<endl;
+					camera->GenerateRay(cs, &r);
+					//float tHit;
+					SurfaceInteraction  isect;
+					colObj += Li(r, *sc, *pixel_sampler, 0);
+
+				} while (pixel_sampler->StartNextSample());
+				//cout << i<<' '<<j<<' '<<colObj << endl;
+				if (colObj.HasNaNs())
+				{
+					cout << i << ' ' << j << ' ' << colObj << endl;
+					//colObj[0] = colObj[1] = colObj[2] = 1.0f;
+				}
+				colObj = colObj / pixel_sampler->samplesPerPixel;
+				cout << i << ' ' << j << ' ' << colObj << endl;
+				write_color(colObj, 1, data, j, i, iw);
+				return;
+			}
+		}
+		stbi_write_png("image.png", image_width, image_height, 3, data, 0);
+		std::cerr << "\nDone.\n";
+		return;
+	}
 	for (int i = 1; i <= thread_count-1; ++i)
 	{
 		pool.push_back(thread([&] {

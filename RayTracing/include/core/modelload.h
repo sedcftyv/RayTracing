@@ -51,10 +51,9 @@ public:
 	 Float maxAniso = 8.f;
 	 Float scale = 1.f;
 	 bool gamma = false;
-	 shared_ptr<Texture<Spectrum>> plasticKd = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map1), diffFilename, trilerp, maxAniso, wrapMode, scale, gamma);
-	 shared_ptr<Texture<Spectrum>> plasticKr = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map2), specFilename, trilerp, maxAniso, wrapMode, scale, gamma);
-	 shared_ptr<Texture<Float>> plasticRoughness = make_shared<ConstantTexture<Float>>(1.f);
+	 shared_ptr<Texture<Spectrum>> base_color = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map1), diffFilename, trilerp, maxAniso, wrapMode, scale, gamma);
+	 shared_ptr<Texture<Spectrum>> Roughness = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map2), specFilename, trilerp, maxAniso, wrapMode, scale, gamma);
 	 shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
-	 return make_shared<PlasticMaterial>(plasticKd, plasticKr,plasticRoughness, bumpMap,true);
+	 return make_shared<MetalRoughnessMaterial>(base_color, Roughness);
  }
 #endif

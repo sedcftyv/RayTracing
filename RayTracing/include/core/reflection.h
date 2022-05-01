@@ -314,6 +314,36 @@ private:
 	const Fresnel *fresnel;
 };
 
+class MetalRoughnessReflection : public BxDF {
+public:
+	// MicrofacetReflection Public Methods
+	MetalRoughnessReflection(const Spectrum &c,
+		const Float &metallic, const Float &roughness,MicrofacetDistribution *distribution)
+		: BxDF(BxDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
+		c(c), metallic(metallic), roughness(roughness),
+		distribution(distribution){}
+	~MetalRoughnessReflection()
+	{
+		//if (fresnel != nullptr)
+		//	delete fresnel;
+		if (distribution != nullptr)
+			delete distribution;
+	}
+	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
+	Spectrum Sample_f(const Vector3f &wo, Vector3f *wi, const Point2f &u,
+		Float *pdf, BxDFType *sampledType) const;
+	Float Pdf(const Vector3f &wo, const Vector3f &wi) const;
+	//std::string ToString() const;
+
+private:
+	// MicrofacetReflection Private Data
+	const Spectrum c;
+	const Float metallic,roughness;
+	const MicrofacetDistribution *distribution;
+	//const Fresnel *fresnel;
+};
+
+
 class MicrofacetTransmission : public BxDF {
 public:
 	// MicrofacetTransmission Public Methods
@@ -342,26 +372,26 @@ private:
 	const TransportMode mode;
 };
 
-class FresnelBlend : public BxDF {
-public:
-	// FresnelBlend Public Methods
-	FresnelBlend(const Spectrum &Rd, const Spectrum &Rs,
-		MicrofacetDistribution *distrib);
-	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
-	Spectrum SchlickFresnel(Float cosTheta) const {
-		auto pow5 = [](Float v) { return (v * v) * (v * v) * v; };
-		return Rs + pow5(1 - cosTheta) * (Spectrum(1.) - Rs);
-	}
-	Spectrum Sample_f(const Vector3f &wi, Vector3f *sampled_f, const Point2f &u,
-		Float *pdf, BxDFType *sampledType) const;
-	Float Pdf(const Vector3f &wo, const Vector3f &wi) const;
-	std::string ToString() const;
-
-private:
-	// FresnelBlend Private Data
-	const Spectrum Rd, Rs;
-	MicrofacetDistribution *distribution;
-};
+//class FresnelBlend : public BxDF {
+//public:
+//	// FresnelBlend Public Methods
+//	FresnelBlend(const Spectrum &Rd, const Spectrum &Rs,
+//		MicrofacetDistribution *distrib);
+//	Spectrum f(const Vector3f &wo, const Vector3f &wi) const;
+//	Spectrum SchlickFresnel(Float cosTheta) const {
+//		auto pow5 = [](Float v) { return (v * v) * (v * v) * v; };
+//		return Rs + pow5(1 - cosTheta) * (Spectrum(1.) - Rs);
+//	}
+//	Spectrum Sample_f(const Vector3f &wi, Vector3f *sampled_f, const Point2f &u,
+//		Float *pdf, BxDFType *sampledType) const;
+//	Float Pdf(const Vector3f &wo, const Vector3f &wi) const;
+//	std::string ToString() const;
+//
+//private:
+//	// FresnelBlend Private Data
+//	const Spectrum Rd, Rs;
+//	MicrofacetDistribution *distribution;
+//};
 
 
 

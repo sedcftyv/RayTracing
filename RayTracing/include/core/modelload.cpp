@@ -88,7 +88,7 @@ shared_ptr<TriangleMesh> ModelLoad::processMesh(aiMesh *mesh, const aiScene *sce
 	if (count == 0)
 		diffTexName.push_back("");
 	else {
-		for (unsigned int i = 0; i < count; ++i)
+		for (unsigned int i = 0; i < 1; ++i)
 		{
 			aiString str;
 			material->GetTexture(aiTextureType_DIFFUSE, i, &str);
@@ -100,7 +100,7 @@ shared_ptr<TriangleMesh> ModelLoad::processMesh(aiMesh *mesh, const aiScene *sce
 	if (count == 0)
 		specTexName.push_back("");
 	else {
-		for (unsigned int i = 0; i < count; ++i)
+		for (unsigned int i = 0; i < 1; ++i)
 		{
 			aiString str;
 			material->GetTexture(aiTextureType_UNKNOWN, i, &str);
@@ -136,8 +136,8 @@ void ModelLoad::buildTextureModel(Transform& tri_Object2World, vector<shared_ptr
 	{
 		string filename1 = directory + "\\" + diffTexName[i];
 		string filename2 = directory + "\\" + specTexName[i];
-		shared_ptr<Material> material = getDiffuseMaterial(filename1);
-		//shared_ptr<Material> material = getPlasticMaterial(filename1, filename2);
+		//shared_ptr<Material> material = getDiffuseMaterial(filename1);
+		shared_ptr<Material> material = getPlasticMaterial(filename1, filename2);
 		for (int j = 0; j < meshes[i]->nTriangles; ++j)
 		{
 			shared_ptr<TriangleMesh> meshPtr = meshes[i];

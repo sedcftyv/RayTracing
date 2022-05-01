@@ -311,3 +311,53 @@ Float MicrofacetDistribution::Pdf(const Vector3f &wo,
 	else
 		return D(wh) * AbsCosTheta(wh);
 }
+
+std::string PBRDistribution::ToString() const {
+	return StringPrintf("[ PBRDistribution roughness: %f ]",roughness);
+}
+
+Float PBRDistribution::Lambda(const Vector3f &w) const {
+	return 0.f;
+}
+
+Vector3f PBRDistribution::Sample_wh(const Vector3f &wo,
+	const Point2f &u) const {
+	Vector3f wh;
+	bool flip = wo.z < 0;
+	wh = TrowbridgeReitzSample(flip ? -wo : wo, roughness, roughness, u[0], u[1]);
+	if (flip) wh = -wh;
+	return wh;
+}
+
+Float PBRDistribution::D(const Vector3f &wh) const {
+	Float a = roughness * roughness;
+	Float a2 = a * a;
+	Float NdotH = std::max(Dot(N, wh), 0.0f);
+	Float NdotH2 = NdotH * NdotH;
+
+	Float nom = a2;
+	Float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+	denom = Pi * denom * denom;
+
+	return nom / denom;
+}
+
+inline Float GeometrySchlickGGX(Float NdotV, Float roughness)
+{
+	Float r = (roughness + 1.0);
+	Float k = (r*r) / 8.0;
+
+	Float nom = NdotV;
+	Float denom = NdotV * (1.0 - k) + k;
+
+	return nom / denom;
+}
+
+Float PBRDistribution::G(const Vector3f &wo, const Vector3f &wi) const {
+	Float NdotV = std::max(Dot(N, wo), 0.0f);
+	Float NdotL = std::max(Dot(N, wi), 0.0f);
+	Float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+	Float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+	return ggx1 * ggx2;
+}

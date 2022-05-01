@@ -92,5 +92,23 @@ inline Float TrowbridgeReitzDistribution::RoughnessToAlpha(Float roughness) {
 		0.000640711f * x * x * x * x;
 }
 
+class PBRDistribution : public MicrofacetDistribution {
+public:
+	// TrowbridgeReitzDistribution Public Methods
+	PBRDistribution(Float roughness, Normal3f N,
+		bool samplevis = true)
+		: MicrofacetDistribution(samplevis),
+		roughness(std::max(0.1f,roughness)),N(N){}
+	Float D(const Vector3f &wh) const;
+	Float G(const Vector3f &wo, const Vector3f &wi) const;
+	Vector3f Sample_wh(const Vector3f &wo, const Point2f &u) const;
+	std::string ToString() const;
+
+private:
+	Float Lambda(const Vector3f &w) const;
+	const Float roughness;
+	const Normal3f N;
+};
+
 
 #endif

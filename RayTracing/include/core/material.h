@@ -92,7 +92,8 @@ public:
 private:
 	// PlasticMaterial Private Data
 	std::shared_ptr<Texture<Spectrum>> Kd, Ks;
-	std::shared_ptr<Texture<Float>> roughness, bumpMap;
+	std::shared_ptr<Texture<Float>> roughness;
+	std::shared_ptr<Texture<Float>> bumpMap;
 	const bool remapRoughness;
 };
 
@@ -122,5 +123,20 @@ private:
 	std::shared_ptr<Texture<Float>> roughness, uRoughness, vRoughness;
 	std::shared_ptr<Texture<Float>> bumpMap;
 	bool remapRoughness;
+};
+
+class MetalRoughnessMaterial : public Material {
+public:
+
+	MetalRoughnessMaterial(const std::shared_ptr<Texture<Spectrum>> &base_color,
+		const std::shared_ptr<Texture<Spectrum>> &metalroughness) 
+		:base_color(base_color),metalroughness(metalroughness){}
+	void ComputeScatteringFunctions(SurfaceInteraction *si,
+		TransportMode mode,
+		bool allowMultipleLobes) const;
+
+private:
+
+	std::shared_ptr<Texture<Spectrum>> base_color,metalroughness;
 };
 #endif

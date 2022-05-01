@@ -54,8 +54,8 @@ public:
 		const Normal3f &dndu, const Normal3f &dndv,
 		Float time, const Shape *sh, int faceIndex=0);
 	~SurfaceInteraction();
-	//void SetShadingGeometry(const Vector3f &dpdu, const Vector3f &dpdv,
-	//	const Normal3f &dndu, const Normal3f &dndv, bool orientationIsAuthoritative);
+	void SetShadingGeometry(const Vector3f &dpdu, const Vector3f &dpdv,
+		const Normal3f &dndu, const Normal3f &dndv, bool orientationIsAuthoritative);
 	//void ComputeScatteringFunctions(const RayDifferential &ray,MemoryArena &arena, bool allowMultipleLobes = false);
 	void ComputeScatteringFunctions(
 		const Ray &ray, bool allowMultipleLobes = false,

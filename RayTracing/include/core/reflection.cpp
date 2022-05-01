@@ -282,6 +282,12 @@ Float BSDF::Pdf(const Vector3f &woWorld, const Vector3f &wiWorld,
 //	return s + std::string(" ]");
 //}
 
+std::string MicrofacetReflection::ToString() const {
+	return std::string("[ MicrofacetReflection R: ") + R.ToString() +
+		std::string(" distribution: ") + distribution->ToString() +
+		std::string(" fresnel: ") + fresnel->ToString() + std::string(" ]");
+}
+
 Spectrum MicrofacetReflection::f(const Vector3f &wo, const Vector3f &wi) const {
 	Float cosThetaO = AbsCosTheta(wo), cosThetaI = AbsCosTheta(wi);
 	Vector3f wh = wi + wo;
@@ -296,10 +302,85 @@ Spectrum MicrofacetReflection::f(const Vector3f &wo, const Vector3f &wi) const {
 		(4 * cosThetaI * cosThetaO);
 }
 
-std::string MicrofacetReflection::ToString() const {
-	return std::string("[ MicrofacetReflection R: ") + R.ToString() +
+Spectrum MicrofacetReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
+	const Point2f &u, Float *pdf,
+	BxDFType *sampledType) const {
+	// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
+	if (wo.z == 0) return 0.;
+	Vector3f wh = distribution->Sample_wh(wo, u);
+	if (Dot(wo, wh) < 0) return 0.;   // Should be rare
+	*wi = Reflect(wo, wh);
+	if (!SameHemisphere(wo, *wi)) return Spectrum(0.f);
+
+	// Compute PDF of _wi_ for microfacet reflection
+	*pdf = distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
+	return f(wo, *wi);
+}
+
+Float MicrofacetReflection::Pdf(const Vector3f &wo, const Vector3f &wi) const {
+	if (!SameHemisphere(wo, wi)) return 0;
+	Vector3f wh = Normalize(wo + wi);
+	return distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
+}
+
+Spectrum MetalRoughnessReflection::f(const Vector3f &wo, const Vector3f &wi) const {
+	Float cosThetaO = AbsCosTheta(wo), cosThetaI = AbsCosTheta(wi);
+	Vector3f wh = wi + wo;
+	// Handle degenerate cases for microfacet reflection
+	if (cosThetaI == 0 || cosThetaO == 0) return Spectrum(0.);
+	if (wh.x == 0 && wh.y == 0 && wh.z == 0) return Spectrum(0.);
+	wh = Normalize(wh);
+	// For the Fresnel call, make sure that wh is in the same hemisphere
+	// as the surface normal, so that TIR is handled correctly.
+	//std::cout << wh << std::endl;
+	Float cos = abs(Dot(wi, wh));
+	//Float cosThetaI = std::max(Dot(wi, Faceforward(wh, Vector3f(0, 0, 1))),0.f);
+	Spectrum F0(0.04);
+	F0 = (1-metallic) * F0 + metallic*c;
+	Spectrum F= F0 + (Spectrum(1.0) - F0) * pow(1.0 - cos, 5.0);
+	Spectrum specular = distribution->D(wh) * distribution->G(wo, wi) * F /
+		(4 * cosThetaI * cosThetaO+0.001);
+	//Float D = DistributionGGX(N, wh, roughness);
+	//Float G = GeometrySmith(N, wo, wi, roughness);
+	//std::cout << 's' << ' ' << distribution->D(wh) << ' ' 	<< distribution->G(wo, wi) << ' '<<F<<std::endl;
+	Spectrum kS = F;
+	Spectrum kD = Spectrum(1.0) - kS;
+	kD *= 1.0 - metallic;
+	//Spectrum F = fresnel->Evaluate(Dot(wi, Faceforward(wh, Vector3f(0, 0, 1))));
+	//std::cout << 's'<<' '<<specular << ' ' << kD * c*InvPi << std::endl;
+	return specular+kD*c*InvPi;
+}
+
+Spectrum MetalRoughnessReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
+	const Point2f &u, Float *pdf,
+	BxDFType *sampledType) const {
+	// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
+	if (wo.z == 0) return 0.;
+	Vector3f wh = distribution->Sample_wh(wo, u);
+	if (Dot(wo, wh) < 0) return 0.;   // Should be rare
+	*wi = Reflect(wo, wh);
+	if (!SameHemisphere(wo, *wi)) return Spectrum(0.f);
+
+	// Compute PDF of _wi_ for microfacet reflection
+	*pdf = distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
+	return f(wo, *wi);
+}
+
+Float MetalRoughnessReflection::Pdf(const Vector3f &wo, const Vector3f &wi) const {
+	if (!SameHemisphere(wo, wi)) return 0;
+	Vector3f wh = Normalize(wo + wi);
+	return distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
+}
+
+std::string MicrofacetTransmission::ToString() const {
+	return std::string("[ MicrofacetTransmission T: ") + T.ToString() +
 		std::string(" distribution: ") + distribution->ToString() +
-		std::string(" fresnel: ") + fresnel->ToString() + std::string(" ]");
+		StringPrintf(" etaA: %f etaB: %f", etaA, etaB) +
+		std::string(" fresnel: ") + fresnel.ToString() +
+		std::string(" mode : ") +
+		(mode == TransportMode::Radiance ? std::string("RADIANCE")
+			: std::string("IMPORTANCE")) +
+		std::string(" ]");
 }
 
 Spectrum MicrofacetTransmission::f(const Vector3f &wo,
@@ -327,66 +408,6 @@ Spectrum MicrofacetTransmission::f(const Vector3f &wo,
 		std::abs(distribution->D(wh) * distribution->G(wo, wi) * eta * eta *
 			AbsDot(wi, wh) * AbsDot(wo, wh) * factor * factor /
 			(cosThetaI * cosThetaO * sqrtDenom * sqrtDenom));
-}
-
-std::string MicrofacetTransmission::ToString() const {
-	return std::string("[ MicrofacetTransmission T: ") + T.ToString() +
-		std::string(" distribution: ") + distribution->ToString() +
-		StringPrintf(" etaA: %f etaB: %f", etaA, etaB) +
-		std::string(" fresnel: ") + fresnel.ToString() +
-		std::string(" mode : ") +
-		(mode == TransportMode::Radiance ? std::string("RADIANCE")
-			: std::string("IMPORTANCE")) +
-		std::string(" ]");
-}
-
-FresnelBlend::FresnelBlend(const Spectrum &Rd, const Spectrum &Rs,
-	MicrofacetDistribution *distribution)
-	: BxDF(BxDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
-	Rd(Rd),
-	Rs(Rs),
-	distribution(distribution) {}
-Spectrum FresnelBlend::f(const Vector3f &wo, const Vector3f &wi) const {
-	auto pow5 = [](Float v) { return (v * v) * (v * v) * v; };
-	Spectrum diffuse = (28.f / (23.f * Pi)) * Rd * (Spectrum(1.f) - Rs) *
-		(1 - pow5(1 - .5f * AbsCosTheta(wi))) *
-		(1 - pow5(1 - .5f * AbsCosTheta(wo)));
-	Vector3f wh = wi + wo;
-	if (wh.x == 0 && wh.y == 0 && wh.z == 0) return Spectrum(0);
-	wh = Normalize(wh);
-	Spectrum specular =
-		distribution->D(wh) /
-		(4 * AbsDot(wi, wh) * std::max(AbsCosTheta(wi), AbsCosTheta(wo))) *
-		SchlickFresnel(Dot(wi, wh));
-	return diffuse + specular;
-}
-
-std::string FresnelBlend::ToString() const {
-	return std::string("[ FresnelBlend Rd: ") + Rd.ToString() +
-		std::string(" Rs: ") + Rs.ToString() +
-		std::string(" distribution: ") + distribution->ToString() +
-		std::string(" ]");
-}
-
-Spectrum MicrofacetReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
-	const Point2f &u, Float *pdf,
-	BxDFType *sampledType) const {
-	// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
-	if (wo.z == 0) return 0.;
-	Vector3f wh = distribution->Sample_wh(wo, u);
-	if (Dot(wo, wh) < 0) return 0.;   // Should be rare
-	*wi = Reflect(wo, wh);
-	if (!SameHemisphere(wo, *wi)) return Spectrum(0.f);
-
-	// Compute PDF of _wi_ for microfacet reflection
-	*pdf = distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
-	return f(wo, *wi);
-}
-
-Float MicrofacetReflection::Pdf(const Vector3f &wo, const Vector3f &wi) const {
-	if (!SameHemisphere(wo, wi)) return 0;
-	Vector3f wh = Normalize(wo + wi);
-	return distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
 }
 
 Spectrum MicrofacetTransmission::Sample_f(const Vector3f &wo, Vector3f *wi,
@@ -418,30 +439,58 @@ Float MicrofacetTransmission::Pdf(const Vector3f &wo,
 	return distribution->Pdf(wo, wh) * dwh_dwi;
 }
 
-Spectrum FresnelBlend::Sample_f(const Vector3f &wo, Vector3f *wi,
-	const Point2f &uOrig, Float *pdf,
-	BxDFType *sampledType) const {
-	Point2f u = uOrig;
-	if (u[0] < .5) {
-		u[0] = std::min(2 * u[0], OneMinusEpsilon);
-		// Cosine-sample the hemisphere, flipping the direction if necessary
-		*wi = CosineSampleHemisphere(u);
-		if (wo.z < 0) wi->z *= -1;
-	}
-	else {
-		u[0] = std::min(2 * (u[0] - .5f), OneMinusEpsilon);
-		// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
-		Vector3f wh = distribution->Sample_wh(wo, u);
-		*wi = Reflect(wo, wh);
-		if (!SameHemisphere(wo, *wi)) return Spectrum(0.f);
-	}
-	*pdf = Pdf(wo, *wi);
-	return f(wo, *wi);
-}
+//FresnelBlend::FresnelBlend(const Spectrum &Rd, const Spectrum &Rs,
+//	MicrofacetDistribution *distribution)
+//	: BxDF(BxDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
+//	Rd(Rd),
+//	Rs(Rs),
+//	distribution(distribution) {}
+//Spectrum FresnelBlend::f(const Vector3f &wo, const Vector3f &wi) const {
+//	auto pow5 = [](Float v) { return (v * v) * (v * v) * v; };
+//	Spectrum diffuse = (28.f / (23.f * Pi)) * Rd * (Spectrum(1.f) - Rs) *
+//		(1 - pow5(1 - .5f * AbsCosTheta(wi))) *
+//		(1 - pow5(1 - .5f * AbsCosTheta(wo)));
+//	Vector3f wh = wi + wo;
+//	if (wh.x == 0 && wh.y == 0 && wh.z == 0) return Spectrum(0);
+//	wh = Normalize(wh);
+//	Spectrum specular =
+//		distribution->D(wh) /
+//		(4 * AbsDot(wi, wh) * std::max(AbsCosTheta(wi), AbsCosTheta(wo))) *
+//		SchlickFresnel(Dot(wi, wh));
+//	return diffuse + specular;
+//}
+//
+//std::string FresnelBlend::ToString() const {
+//	return std::string("[ FresnelBlend Rd: ") + Rd.ToString() +
+//		std::string(" Rs: ") + Rs.ToString() +
+//		std::string(" distribution: ") + distribution->ToString() +
+//		std::string(" ]");
+//}
 
-Float FresnelBlend::Pdf(const Vector3f &wo, const Vector3f &wi) const {
-	if (!SameHemisphere(wo, wi)) return 0;
-	Vector3f wh = Normalize(wo + wi);
-	Float pdf_wh = distribution->Pdf(wo, wh);
-	return .5f * (AbsCosTheta(wi) * InvPi + pdf_wh / (4 * Dot(wo, wh)));
-}
+//Spectrum FresnelBlend::Sample_f(const Vector3f &wo, Vector3f *wi,
+//	const Point2f &uOrig, Float *pdf,
+//	BxDFType *sampledType) const {
+//	Point2f u = uOrig;
+//	if (u[0] < .5) {
+//		u[0] = std::min(2 * u[0], OneMinusEpsilon);
+//		// Cosine-sample the hemisphere, flipping the direction if necessary
+//		*wi = CosineSampleHemisphere(u);
+//		if (wo.z < 0) wi->z *= -1;
+//	}
+//	else {
+//		u[0] = std::min(2 * (u[0] - .5f), OneMinusEpsilon);
+//		// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
+//		Vector3f wh = distribution->Sample_wh(wo, u);
+//		*wi = Reflect(wo, wh);
+//		if (!SameHemisphere(wo, *wi)) return Spectrum(0.f);
+//	}
+//	*pdf = Pdf(wo, *wi);
+//	return f(wo, *wi);
+//}
+//
+//Float FresnelBlend::Pdf(const Vector3f &wo, const Vector3f &wi) const {
+//	if (!SameHemisphere(wo, wi)) return 0;
+//	Vector3f wh = Normalize(wo + wi);
+//	Float pdf_wh = distribution->Pdf(wo, wh);
+//	return .5f * (AbsCosTheta(wi) * InvPi + pdf_wh / (4 * Dot(wo, wh)));
+//}
