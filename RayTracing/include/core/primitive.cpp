@@ -43,6 +43,7 @@ bool GeometricPrimitive::Intersect(const Ray &r,
 	Float tHit;
 	if (!shape->Intersect(r, &tHit, isect)) return false;
 	r.tMax = tHit;
+	//std::cout << r.tMax << std::endl;
 	isect->primitive = this;
 	//CHECK_GE(Dot(isect->n, isect->shading.n), 0.);
 	//// Initialize _SurfaceInteraction::mediumInterface_ after _Shape_

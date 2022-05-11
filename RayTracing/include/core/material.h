@@ -18,32 +18,31 @@ class MatteMaterial : public Material {
 public:
 	// MatteMaterial Public Methods
 	MatteMaterial(const std::shared_ptr<Texture<Spectrum>> &Kd,
-		const std::shared_ptr<Texture<Float>> &sigma,
-		const std::shared_ptr<Texture<Float>> &bumpMap)
-		: Kd(Kd), sigma(sigma), bumpMap(bumpMap) {}
+		const std::shared_ptr<Texture<Float>> &sigma)
+		//const std::shared_ptr<Texture<Float>> &bumpMap)
+		: Kd(Kd), sigma(sigma) {}
+	//bumpMap(bumpMap) 
 	void ComputeScatteringFunctions(SurfaceInteraction *si,TransportMode mode,bool allowMultipleLobes) const;
 
 private:
 	// MatteMaterial Private Data
 	std::shared_ptr<Texture<Spectrum>> Kd;
-	std::shared_ptr<Texture<Float>> sigma, bumpMap;
+	std::shared_ptr<Texture<Float>> sigma;// bumpMap;
 };
 
 class MirrorMaterial : public Material {
 public:
 	// MirrorMaterial Public Methods
-	MirrorMaterial(const std::shared_ptr<Texture<Spectrum>> &r,
-		const std::shared_ptr<Texture<Float>> &bump) {
-		Kr = r;
-		bumpMap = bump;
-	}
+	MirrorMaterial(const std::shared_ptr<Texture<Spectrum>> &r)
+		//const std::shared_ptr<Texture<Float>> &bump
+		:Kr(r){}
 	void ComputeScatteringFunctions(SurfaceInteraction *si,TransportMode mode,
 		bool allowMultipleLobes) const;
 
 private:
 	// MirrorMaterial Private Data
 	std::shared_ptr<Texture<Spectrum>> Kr;
-	std::shared_ptr<Texture<Float>> bumpMap;
+	//std::shared_ptr<Texture<Float>> bumpMap;
 };
 
 class GlassMaterial : public Material {
@@ -53,12 +52,12 @@ public:
 		const std::shared_ptr<Texture<Spectrum>> &Kt,
 		//const std::shared_ptr<Texture<Float>> &uRoughness,
 		//const std::shared_ptr<Texture<Float>> &vRoughness,
-		const std::shared_ptr<Texture<Float>> &index,
-		const std::shared_ptr<Texture<Float>> &bumpMap)
+		const std::shared_ptr<Texture<Float>> &index)
+		//const std::shared_ptr<Texture<Float>> &bumpMap)
 		: Kr(Kr),
 		Kt(Kt),
-		index(index),
-		bumpMap(bumpMap){}
+		index(index) {}
+		//bumpMap(bumpMap)
 	void ComputeScatteringFunctions(SurfaceInteraction *si,
 		TransportMode mode,
 		bool allowMultipleLobes) const;
@@ -68,7 +67,7 @@ private:
 	std::shared_ptr<Texture<Spectrum>> Kr, Kt;
 	//std::shared_ptr<Texture<Float>> uRoughness, vRoughness;
 	std::shared_ptr<Texture<Float>> index;
-	std::shared_ptr<Texture<Float>> bumpMap;
+	//std::shared_ptr<Texture<Float>> bumpMap;
 	//bool remapRoughness;
 };
 
@@ -78,12 +77,12 @@ public:
 	PlasticMaterial(const std::shared_ptr<Texture<Spectrum>> &Kd,
 		const std::shared_ptr<Texture<Spectrum>> &Ks,
 		const std::shared_ptr<Texture<Float>> &roughness,
-		const std::shared_ptr<Texture<Float>> &bumpMap,
+		//const std::shared_ptr<Texture<Float>> &bumpMap,
 		bool remapRoughness)
 		: Kd(Kd),
 		Ks(Ks),
 		roughness(roughness),
-		bumpMap(bumpMap),
+		//bumpMap(bumpMap),
 		remapRoughness(remapRoughness) {}
 	void ComputeScatteringFunctions(SurfaceInteraction *si,
 		TransportMode mode,
@@ -93,7 +92,7 @@ private:
 	// PlasticMaterial Private Data
 	std::shared_ptr<Texture<Spectrum>> Kd, Ks;
 	std::shared_ptr<Texture<Float>> roughness;
-	std::shared_ptr<Texture<Float>> bumpMap;
+	//std::shared_ptr<Texture<Float>> bumpMap;
 	const bool remapRoughness;
 };
 
@@ -105,13 +104,13 @@ public:
 		const std::shared_ptr<Texture<Float>> &rough,
 		const std::shared_ptr<Texture<Float>> &urough,
 		const std::shared_ptr<Texture<Float>> &vrough,
-		const std::shared_ptr<Texture<Float>> &bump,
+		//const std::shared_ptr<Texture<Float>> &bump,
 		bool remapRoughness):eta(eta),
 		k(k),
 		roughness(rough),
 		uRoughness(urough),
 		vRoughness(vrough),
-		bumpMap(bump),
+		//bumpMap(bump),
 		remapRoughness(remapRoughness) {}
 	void ComputeScatteringFunctions(SurfaceInteraction *si, 
 		TransportMode mode,
@@ -121,7 +120,7 @@ private:
 	// MetalMaterial Private Data
 	std::shared_ptr<Texture<Spectrum>> eta, k;
 	std::shared_ptr<Texture<Float>> roughness, uRoughness, vRoughness;
-	std::shared_ptr<Texture<Float>> bumpMap;
+	//std::shared_ptr<Texture<Float>> bumpMap;
 	bool remapRoughness;
 };
 

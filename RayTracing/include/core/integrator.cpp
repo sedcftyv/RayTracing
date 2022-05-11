@@ -361,6 +361,7 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 
 		// Intersect _ray_ with scene and store intersection in _isect_
 		SurfaceInteraction isect;
+		//cout << 's' << endl;
 		bool foundIntersection = scene.Intersect(ray, &isect);
 
 		// Possibly add emitted light at intersection
@@ -549,13 +550,13 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 				cout << j << endl;
 			for (int i = 0; i < image_width; i++) {
 				//cout << j << ' ' << i << endl;
-				//i = 90; j = 90;
-				if (j < 85 || j>90 || i < 86 || i>90)
-				{
-					Spectrum colObj(1.0f,0.0f,0.0f);
-					write_color(colObj, 1, data, j, i, iw);
-					continue;
-				}
+				i = 480; j = 420;
+				//if (j < 85 || j>90 || i < 86 || i>90)
+				//{
+				//	Spectrum colObj(1.0f,0.0f,0.0f);
+				//	write_color(colObj, 1, data, j, i, iw);
+				//	continue;
+				//}
 				std::unique_ptr<Sampler>pixel_sampler = sampler->Clone(i + j * iw);
 				Point2i pixel = Point2i(i, j);
 				pixel_sampler->StartPixel(pixel);
@@ -572,14 +573,18 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 					colObj += Li(r, *sc, *pixel_sampler, 0);
 
 				} while (pixel_sampler->StartNextSample());
-				//cout << i<<' '<<j<<' '<<colObj << endl;
+				cout << i<<' '<<j<<' '<<colObj << ' '<< pixel_sampler->samplesPerPixel<<endl;
 				if (colObj.HasNaNs())
 				{
-					cout << i << ' ' << j << ' ' << colObj << endl;
+					cout << 'h'<<' '<<i << ' ' << j << ' ' << colObj << endl;
 					//colObj[0] = colObj[1] = colObj[2] = 1.0f;
 				}
+				else if (colObj.IsBlack())
+				{
+					cout << 'b' << ' ' << i << ' ' << j << ' ' << colObj << endl;
+				}
 				colObj = colObj / pixel_sampler->samplesPerPixel;
-				cout << i << ' ' << j << ' ' << colObj << endl;
+				//cout << i << ' ' << j << ' ' << colObj << endl;
 				write_color(colObj, 1, data, j, i, iw);
 				return;
 			}

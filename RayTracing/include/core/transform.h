@@ -125,7 +125,7 @@ public:
 	Bounds3f operator()(const Bounds3f &b) const;
 	Transform operator*(const Transform &t2) const;
 	bool SwapsHandedness() const;
-	//SurfaceInteraction operator()(const SurfaceInteraction &si) const;
+	SurfaceInteraction operator()(const SurfaceInteraction &si) const;
 	//template <typename T> inline Point3<T> operator()(const Point3<T> &pt, Vector3<T> *absError) const;
 	//template <typename T> inline Point3<T> operator()(const Point3<T> &p, const Vector3<T> &pError,Vector3<T> *pTransError) const;
 	//template <typename T> inline Vector3<T>
@@ -142,8 +142,8 @@ public:
 private:
 	//<< Transform Private Data >>
 	Matrix4x4 m, mInv;
-	friend class AnimatedTransform;
-	friend struct Quaternion;
+	//friend class AnimatedTransform;
+	//friend struct Quaternion;
 };
 
 inline Ray Transform::operator()(const Ray &r) const {

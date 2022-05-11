@@ -38,8 +38,8 @@ public:
 	bool gamma = false;
 	shared_ptr<Texture<Spectrum>> Kt = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map), filename, trilerp, maxAniso, wrapMode, scale, gamma);
 	shared_ptr<Texture<Float>> sigmaRed = make_shared<ConstantTexture<Float>>(0.0f);
-	shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
-	return make_shared<MatteMaterial>(Kt, sigmaRed, bumpMap);
+	//shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
+	return make_shared<MatteMaterial>(Kt, sigmaRed);
 }
 
  inline shared_ptr<Material> getPlasticMaterial(string diffFilename,string specFilename)
@@ -53,7 +53,7 @@ public:
 	 bool gamma = false;
 	 shared_ptr<Texture<Spectrum>> base_color = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map1), diffFilename, trilerp, maxAniso, wrapMode, scale, gamma);
 	 shared_ptr<Texture<Spectrum>> Roughness = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map2), specFilename, trilerp, maxAniso, wrapMode, scale, gamma);
-	 shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
+	 //shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
 	 return make_shared<MetalRoughnessMaterial>(base_color, Roughness);
  }
 #endif
