@@ -98,7 +98,7 @@ Spectrum EstimateDirect(const Interaction &it, const Point2f &uScattering,
 			const SurfaceInteraction &isect = (const SurfaceInteraction &)it;
 			f = isect.bsdf->f(isect.wo, wi, bsdfFlags) *
 				AbsDot(wi, isect.shading.n);
-			scatteringPdf = isect.bsdf->Pdf(isect.wo, wi, bsdfFlags);
+			//scatteringPdf = isect.bsdf->Pdf(isect.wo, wi, bsdfFlags);
 			//VLOG(2) << "  surf f*dot :" << f << ", scatteringPdf: " << scatteringPdf;
 		}
 		//else {
@@ -468,6 +468,80 @@ Spectrum PathIntegrator::Li(const Ray &r, const Scene &scene,
 	//cout << L << endl;
 	return L;
 }
+Spectrum SamplerIntegrator::Li_re(const Ray &r, const Scene &scene,
+	Sampler &sampler, int depth) const {
+	return Spectrum(0.f);
+}
+
+bool perfectspecular = false;
+Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
+	Sampler &sampler, int depth) const {
+	Spectrum L(0.f), beta(1.f);
+	Ray ray(r);
+	SurfaceInteraction isect;
+	bool foundIntersection = scene.Intersect(ray, &isect);
+	// Possibly add emitted light at intersection
+	if (depth == 0 || perfectspecular|| scene.lights.size()==0) {
+		// Add emitted light at path vertex or from the environment
+		if (foundIntersection) {
+			L += isect.Le(-ray.d) / std::max(1.f, DistanceSquared(ray.o, isect.p));
+			if (!L.IsBlack())
+				return L;
+		}
+		else if(scene.lights.size() == 0)
+			L += Spectrum(0.8f);
+	}
+	//if (L.HasNaNs())
+	//	cout << L << endl;
+
+	// Terminate path if ray escaped or _maxDepth_ was reached
+	if (!foundIntersection || depth >= maxDepth)
+		return L;
+
+	// Compute scattering functions and skip over medium boundaries
+	isect.ComputeScatteringFunctions(ray, true);
+	//if (L.HasNaNs())
+	//	cout << L << endl;
+	const Distribution1D *distrib = lightDistribution->Lookup(isect.p);
+
+	// Sample illumination from lights to find path contribution.
+	// (But skip this for perfectly specular BSDFs.)
+	if (isect.bsdf->NumComponents(BxDFType(BSDF_ALL & ~BSDF_SPECULAR)) >0) 
+	{
+		Spectrum Ld = UniformSampleOneLight(isect, scene,sampler, false, distrib);
+		//cout << beta << endl;
+		if (Ld.IsBlack()) 
+			++zeroRadiancePaths;
+		//cout << Ld << endl;
+		L += Ld;
+	}
+	//if (L.HasNaNs())
+	//	cout << L << endl;
+	// Sample BSDF to get new path direction
+	Vector3f wo = -ray.d, wi;
+	Float pdf;
+	BxDFType flags;
+	Spectrum f = isect.bsdf->Sample_f(wo, &wi, sampler.Get2D(), &pdf, BSDF_ALL, &flags);
+	if (f.IsBlack() || pdf == 0.f) 
+		return L ;
+
+	beta *= f * AbsDot(wi, isect.shading.n) / pdf;
+	perfectspecular = (flags & BSDF_SPECULAR) != 0;
+	Float dis = DistanceSquared(ray.o, isect.p);
+	ray = isect.SpawnRay(wi);
+	//cout << L << endl;
+	if (depth > 3) {
+		Float q = std::max((Float).05, 1 - beta.MaxComponentValue());
+		if (sampler.Get1D() < q) 
+			return L;
+		beta /= 1 - q;
+	}
+	//cout << DistanceSquared(ray.o, isect.p) << endl;
+	return L + beta*Li_re(ray, scene, sampler, depth + 1);
+	//if (L.HasNaNs())
+	//	cout << L << endl;
+}
+
 
 inline void write_color(Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w) {
 	auto r = pixel_color[0];
@@ -524,7 +598,9 @@ void SamplerIntegrator::render_pixel(int nowpos)
 		camera->GenerateRay(cs, &r);
 		//float tHit;
 		SurfaceInteraction  isect;
-		colObj += Li(r, *sc, *pixel_sampler, 0);
+		//colObj += Li(r, *sc, *pixel_sampler, 0);
+		perfectspecular = false;
+		colObj += Li_re(r, *sc, *pixel_sampler, 0);
 
 	} while (pixel_sampler->StartNextSample());
 	//cout << i<<' '<<j<<' '<<colObj << endl;

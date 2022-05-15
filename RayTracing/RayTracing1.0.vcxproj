@@ -168,7 +168,6 @@
     <ClCompile Include="include\core\camera.cpp" />
     <ClCompile Include="include\core\imageio.cpp" />
     <ClCompile Include="include\core\imagemap.cpp" />
-    <ClCompile Include="include\core\infinite.cpp" />
     <ClCompile Include="include\core\integrator.cpp" />
     <ClCompile Include="include\core\interaction.cpp" />
     <ClCompile Include="include\core\light.cpp" />
@@ -197,7 +196,6 @@
     <ClInclude Include="include\core\geometry.h" />
     <ClInclude Include="include\core\imageio.h" />
     <ClInclude Include="include\core\imagemap.h" />
-    <ClInclude Include="include\core\infinite.h" />
     <ClInclude Include="include\core\integrator.h" />
     <ClInclude Include="include\core\interaction.h" />
     <ClInclude Include="include\core\light.h" />

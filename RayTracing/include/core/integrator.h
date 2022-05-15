@@ -49,6 +49,8 @@ public:
 	void Render(const Scene &scene, int image_width, int image_height);
 	virtual Spectrum Li(const Ray &ray, const Scene &scene,
 		Sampler &sampler, int depth = 0) const = 0;
+	virtual Spectrum Li_re(const Ray &ray, const Scene &scene,
+		Sampler &sampler, int depth = 0) const;
 	Spectrum SpecularReflect(const Ray &ray,
 		const SurfaceInteraction &isect,
 		const Scene &scene, Sampler &sampler,int depth) const;
@@ -94,6 +96,9 @@ public:
 
 	void Preprocess(const Scene &scene, Sampler &sampler);
 	Spectrum Li(const Ray &ray, const Scene &scene,
+		Sampler &sampler, int depth) const;
+
+	Spectrum Li_re(const Ray &ray, const Scene &scene,
 		Sampler &sampler, int depth) const;
 
 private:

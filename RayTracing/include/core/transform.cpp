@@ -155,7 +155,7 @@ Transform Rotate(Float theta, const Vector3f &axis) {
 	return Transform(m, Transpose(m));
 }
 
-Transform LookAt(const Vector3f &pos, const Vector3f &look, const Vector3f &up) {
+Transform LookAt(const Point3f &pos, const Point3f &look, const Vector3f &up) {
 	Matrix4x4 cameraToWorld;
 	// Initialize fourth column of viewing matrix
 	cameraToWorld.m[0][3] = pos.x;
@@ -257,8 +257,10 @@ Transform Orthographic(Float zNear, Float zFar) {
 
 Transform Perspective(Float fov, Float n, Float f) {
 	// Perform projective divide for perspective projection
-	Matrix4x4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, f / (f - n), -f * n / (f - n),
-		0, 0, 1, 0);
+	Matrix4x4 persp(1, 0, 0, 0, 
+					0, 1, 0, 0, 
+					0, 0, f / (f - n), -f * n / (f - n),
+					0, 0, 1, 0);
 
 	// Scale canonical perspective view to specified field of view
 	Float invTanAng = 1 / std::tan(Radians(fov) / 2);

@@ -27,7 +27,7 @@ Interaction Shape::Sample(const Interaction &ref, const Point2f &u,Float *pdf) c
 		// above, to solid angle measure.
 		*pdf *= DistanceSquared(ref.p, intr.p) / AbsDot(intr.n, -wi);
 		if (std::isinf(*pdf)) *pdf = 0.f;
-	}
+	} 
 	return intr;
 }
 
