@@ -323,7 +323,8 @@ Float MicrofacetReflection::Pdf(const Vector3f &wo, const Vector3f &wi) const {
 	return distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
 }
 
-Spectrum MetalRoughnessReflection::f(const Vector3f &wo, const Vector3f &wi) const {
+Spectrum MetalRoughnessReflection::f(const Vector3f &wo, const Vector3f &wi) const 
+{
 	Float cosThetaO = AbsCosTheta(wo), cosThetaI = AbsCosTheta(wi);
 	Vector3f wh = wi + wo;
 	// Handle degenerate cases for microfacet reflection
@@ -332,8 +333,8 @@ Spectrum MetalRoughnessReflection::f(const Vector3f &wo, const Vector3f &wi) con
 	wh = Normalize(wh);
 	// For the Fresnel call, make sure that wh is in the same hemisphere
 	// as the surface normal, so that TIR is handled correctly.
-	//std::cout << wh << std::endl;
-	Float cos = abs(Dot(wi, wh));
+	// std::cout << wh << std::endl;
+	Float cos = abs(Dot(wi, Faceforward(wh, Vector3f(0, 0, 1))));
 	//Float cosThetaI = std::max(Dot(wi, Faceforward(wh, Vector3f(0, 0, 1))),0.f);
 	Spectrum F0(0.04);
 	F0 = (1-metallic) * F0 + metallic*c;
@@ -352,8 +353,7 @@ Spectrum MetalRoughnessReflection::f(const Vector3f &wo, const Vector3f &wi) con
 }
 
 Spectrum MetalRoughnessReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
-	const Point2f &u, Float *pdf,
-	BxDFType *sampledType) const {
+	const Point2f &u, Float *pdf,BxDFType *sampledType) const {
 	// Sample microfacet orientation Undefined control sequence \wh and reflected direction Undefined control sequence \wi
 	if (wo.z == 0) return 0.;
 	Vector3f wh = distribution->Sample_wh(wo, u);

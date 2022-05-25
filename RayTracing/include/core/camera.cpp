@@ -62,10 +62,9 @@ Float PerspectiveCamera::GenerateRay(const CameraSample &sample,Ray *ray) const 
 	return 1;
 }
 
-PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world,int image_width,int image_height)
+PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world, Float focaldistance,Float fov,int image_width,int image_height)
 {
 	Float lensradius = 0.0f;
-	Float focaldistance = 0.0f;
 	Float frame = (float)image_width / (float)image_height;
 	Bounds2f screen;
 	if (frame > 1.f) {
@@ -80,7 +79,6 @@ PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world,int image_
 		screen.pMin.y = -1.f / frame;
 		screen.pMax.y = 1.f / frame;
 	}
-	Float fov = 90.0f;
-	Float halffov = 45.0f;
+	Float halffov = fov/2.0f;
 	return new PerspectiveCamera(cam2world, screen, lensradius, focaldistance, fov, image_width, image_height);
 }

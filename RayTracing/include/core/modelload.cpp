@@ -4,20 +4,6 @@
 #include<core/primitive.h>
 #include<core/imagemap.h>
 
-void ModelLoad::processNode(aiNode *node, const aiScene *scene, const Transform &ObjectToWorld)
-{
-	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
-	{
-		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene, ObjectToWorld));
-
-	}
-
-	for (unsigned int i = 0; i < node->mNumChildren; ++i)
-		processNode(node->mChildren[i], scene, ObjectToWorld);
-
-}
-
 void ModelLoad::loadModel(std::string path, const Transform &ObjectToWorld)
 {
 	Assimp::Importer import;
@@ -30,6 +16,17 @@ void ModelLoad::loadModel(std::string path, const Transform &ObjectToWorld)
 	}
 	directory = path.substr(0, path.find_last_of('\\'));
 	processNode(scene->mRootNode, scene, ObjectToWorld);
+}
+
+void ModelLoad::processNode(aiNode *node, const aiScene *scene, const Transform &ObjectToWorld)
+{
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+	{
+		aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+		meshes.push_back(processMesh(mesh, scene, ObjectToWorld));
+	}
+	for (unsigned int i = 0; i < node->mNumChildren; ++i)
+		processNode(node->mChildren[i], scene, ObjectToWorld);
 }
 
 shared_ptr<TriangleMesh> ModelLoad::processMesh(aiMesh *mesh, const aiScene *scene, const Transform &ObjectToWorld)
@@ -136,8 +133,13 @@ void ModelLoad::buildTextureModel(Transform& tri_Object2World, vector<shared_ptr
 	{
 		string filename1 = directory + "\\" + diffTexName[i];
 		string filename2 = directory + "\\" + specTexName[i];
-		//shared_ptr<Material> material = getDiffuseMaterial(filename1);
-		shared_ptr<Material> material = getPlasticMaterial(filename1, filename2);
+		shared_ptr<Material> material;
+		if (diffTexName[i] != ""&&specTexName[i] != "")
+		{
+			material = getMetalRoughnessMaterial(filename1, filename2);
+		}
+		else
+			material = getDiffuseMaterial(filename1);
 		for (int j = 0; j < meshes[i]->nTriangles; ++j)
 		{
 			shared_ptr<TriangleMesh> meshPtr = meshes[i];

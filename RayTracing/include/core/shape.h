@@ -23,7 +23,7 @@ public:
 		return Intersect(ray, nullptr, nullptr, testAlphaTexture);
 	}
 	virtual Float Area() const = 0;
-	virtual Interaction Sample(const Point2f &u, Float *pdf) const = 0;
+	virtual Interaction Sample(const Point2f &u, Float *pdf) const;
 	virtual Float Pdf(const Interaction &) const { return 1 / Area(); }
 	virtual Interaction Sample(const Interaction &ref, const Point2f &u,
 		Float *pdf) const;
@@ -35,15 +35,5 @@ public:
 	const bool reverseOrientation;
 	const bool transformSwapsHandedness;
 };
-
-
-
-
-
-
-
-
-
-
 
 #endif

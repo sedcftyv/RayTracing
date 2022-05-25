@@ -16,6 +16,8 @@ Shape::Shape(const Transform *ObjectToWorld, const Transform *WorldToObject,
 
 Bounds3f Shape::WorldBound() const { return (*ObjectToWorld)(ObjectBound()); }
 
+Interaction Shape::Sample(const Point2f &u, Float *pdf) const { return Interaction(); }
+
 Interaction Shape::Sample(const Interaction &ref, const Point2f &u,Float *pdf) const {
 	Interaction intr = Sample(u, pdf);
 	Vector3f wi = intr.p - ref.p;

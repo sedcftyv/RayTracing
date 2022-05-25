@@ -86,7 +86,7 @@ class PerspectiveCamera : public ProjectiveCamera {
 public:
 	// PerspectiveCamera Public Methods
 	PerspectiveCamera(const Transform &CameraToWorld, const Bounds2f &screenWindow, Float lensRadius, Float focalDistance, Float fov,int image_width, int image_height)
-		:ProjectiveCamera(CameraToWorld, Perspective(fov, 1e-2f, 1000.f),
+		:ProjectiveCamera(CameraToWorld, Perspective(fov, focalDistance, 1000.f),
 			screenWindow,lensRadius,focalDistance, image_width, image_height)
 	{
 		// Compute image plane bounds at z=1 for _PerspectiveCamera_
@@ -104,7 +104,7 @@ private:
 	//Float A;
 };
 
-PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world, int image_width, int image_height);
+PerspectiveCamera *CreatePerspectiveCamera(const Transform &cam2world, Float focaldistance, Float fov, int image_width, int image_height);
 
 
 

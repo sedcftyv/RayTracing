@@ -712,7 +712,6 @@ inline Normal3<T> operator*(U f, const Normal3<T> &n) {
 	return Normal3<T>(f * n.x, f * n.y, f * n.z);
 }
 
-
 typedef Normal3<Float> Normal3f;
 
 class Ray {
@@ -911,7 +910,6 @@ public:
 
 };
 
-
 template <typename T>
 inline const Point3<T> &Bounds3<T>::operator[](int i) const {
 	DCHECK(i == 0 || i == 1);
@@ -923,6 +921,7 @@ inline Point3<T> &Bounds3<T>::operator[](int i) {
 	DCHECK(i == 0 || i == 1);
 	return (i == 0) ? pMin : pMax;
 }
+
 template <typename T> Bounds3 <T> Union(const Bounds3<T> &b, const Point3<T> &p) {
 		return Bounds3<T>(Point3<T>(std::min(b.pMin.x, p.x),
 			std::min(b.pMin.y, p.y),
@@ -1029,13 +1028,13 @@ inline bool Bounds3<T>::IntersectP(const Ray &ray, const Vector3f &invDir,const 
 
 
 inline Point3f OffsetRayOrigin(const Point3f &p, const Normal3f &n, const Vector3f &w) {
-	//Float d = Dot(Abs(n), pError);
-	//Vector3f offset = d * Vector3f(n);
-	//if (Dot(w, n) < 0)
-	//	offset = -offset;
-	//Point3f po = p + offset;
+	Float d = Dot(Abs(n), Vector3f(1e-4, 1e-4, 1e-4));
+	Vector3f offset = d * Vector3f(n);
+	if (Dot(w, n) < 0)
+		offset = -offset;
+	Point3f po = p + offset;
 	//<< Round offset point po away from p >>
-	Point3f po = p;
+	//Point3f po = p;
 		return po;
 }
 

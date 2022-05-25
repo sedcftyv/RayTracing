@@ -481,15 +481,22 @@ Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
 	SurfaceInteraction isect;
 	bool foundIntersection = scene.Intersect(ray, &isect);
 	// Possibly add emitted light at intersection
-	if (depth == 0 || perfectspecular|| scene.lights.size()==0) {
+	if (depth == 0 || perfectspecular|| scene.lights.size()==0) 
+	{
 		// Add emitted light at path vertex or from the environment
 		if (foundIntersection) {
-			L += isect.Le(-ray.d) / std::max(1.f, DistanceSquared(ray.o, isect.p));
+			L += isect.Le(-ray.d) ;
+			//L += isect.Le(-ray.d) / std::max(1.f, DistanceSquared(ray.o, isect.p));
 			if (!L.IsBlack())
 				return L;
 		}
-		else if(scene.lights.size() == 0)
-			L += Spectrum(0.8f);
+		else if (scene.lights.size() == 0)
+		{
+			Vector3f unit_direction = Normalize(r.d);
+			auto t = 0.5*(unit_direction[1] + 1.0);
+			L+= (1.0 - t)*Spectrum(1.0, 1.0, 1.0) + t * Spectrum(0.5, 0.7, 1.0);
+			//L += Spectrum(0.8f);
+		}
 	}
 	//if (L.HasNaNs())
 	//	cout << L << endl;
@@ -502,13 +509,13 @@ Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
 	isect.ComputeScatteringFunctions(ray, true);
 	//if (L.HasNaNs())
 	//	cout << L << endl;
-	const Distribution1D *distrib = lightDistribution->Lookup(isect.p);
-
+	//const Distribution1D *distrib = lightDistribution->Lookup(isect.p);
+	
 	// Sample illumination from lights to find path contribution.
 	// (But skip this for perfectly specular BSDFs.)
 	if (isect.bsdf->NumComponents(BxDFType(BSDF_ALL & ~BSDF_SPECULAR)) >0) 
 	{
-		Spectrum Ld = UniformSampleOneLight(isect, scene,sampler, false, distrib);
+		Spectrum Ld = UniformSampleOneLight(isect, scene,sampler, false, nullptr);
 		//cout << beta << endl;
 		if (Ld.IsBlack()) 
 			++zeroRadiancePaths;
@@ -517,7 +524,6 @@ Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
 	}
 	//if (L.HasNaNs())
 	//	cout << L << endl;
-	// Sample BSDF to get new path direction
 	Vector3f wo = -ray.d, wi;
 	Float pdf;
 	BxDFType flags;
@@ -527,7 +533,7 @@ Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
 
 	beta *= f * AbsDot(wi, isect.shading.n) / pdf;
 	perfectspecular = (flags & BSDF_SPECULAR) != 0;
-	Float dis = DistanceSquared(ray.o, isect.p);
+	//Float dis = DistanceSquared(ray.o, isect.p);
 	ray = isect.SpawnRay(wi);
 	//cout << L << endl;
 	if (depth > 3) {
@@ -537,11 +543,17 @@ Spectrum PathIntegrator::Li_re(const Ray &r, const Scene &scene,
 		beta /= 1 - q;
 	}
 	//cout << DistanceSquared(ray.o, isect.p) << endl;
+	//cout << depth << endl;
 	return L + beta*Li_re(ray, scene, sampler, depth + 1);
 	//if (L.HasNaNs())
 	//	cout << L << endl;
 }
 
+inline Float clamp(Float x, Float min, Float max) {
+	if (x < min) return min;
+	if (x > max) return max;
+	return x;
+}
 
 inline void write_color(Spectrum pixel_color, int samples_per_pixel, unsigned char *data,int j,int i,int w) {
 	auto r = pixel_color[0];
@@ -616,7 +628,7 @@ void SamplerIntegrator::render_pixel(int nowpos)
 void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_height) {
 	iw = image_width;ih = image_height;
 	sc = &scene;
-	Preprocess(scene, *sampler);
+	//Preprocess(scene, *sampler);
 	data = new unsigned char[image_height*image_width*3];
 	maxpos = image_height * image_width;
 	if (thread_count == 1)
@@ -626,7 +638,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 				cout << j << endl;
 			for (int i = 0; i < image_width; i++) {
 				//cout << j << ' ' << i << endl;
-				i = 480; j = 420;
+				i = 445; j = 400;
 				//if (j < 85 || j>90 || i < 86 || i>90)
 				//{
 				//	Spectrum colObj(1.0f,0.0f,0.0f);
@@ -646,7 +658,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 					camera->GenerateRay(cs, &r);
 					//float tHit;
 					SurfaceInteraction  isect;
-					colObj += Li(r, *sc, *pixel_sampler, 0);
+					colObj += Li_re(r, *sc, *pixel_sampler, 0);
 
 				} while (pixel_sampler->StartNextSample());
 				cout << i<<' '<<j<<' '<<colObj << ' '<< pixel_sampler->samplesPerPixel<<endl;
@@ -660,7 +672,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 					cout << 'b' << ' ' << i << ' ' << j << ' ' << colObj << endl;
 				}
 				colObj = colObj / pixel_sampler->samplesPerPixel;
-				//cout << i << ' ' << j << ' ' << colObj << endl;
+				cout << i << ' ' << j << ' ' << colObj << endl;
 				write_color(colObj, 1, data, j, i, iw);
 				return;
 			}

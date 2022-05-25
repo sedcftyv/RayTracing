@@ -75,6 +75,7 @@ bool Sphere::Intersect(const Ray &r, Float *tHit, SurfaceInteraction *isect,
 		if (tShapeHit > ray.tMax) return false;
 	}
 	Point3f pHit = Point3f(ray((Float)tShapeHit));
+	//std::cout << pHit<<' '<<Vector3f(pHit).Length() << std::endl;
 	Float phi = std::atan2(pHit.y, pHit.x);
 	if (phi < 0) phi += 2 * Pi;
 
@@ -90,29 +91,28 @@ bool Sphere::Intersect(const Ray &r, Float *tHit, SurfaceInteraction *isect,
 	Vector3f dpdu(-phiMax * pHit.y, phiMax * pHit.x, 0);
 	Vector3f dpdv = Pi *
 		Vector3f(pHit.z * cosPhi, pHit.z * sinPhi, -radius * std::sin(theta));
-
+	
 	//Normal3f n = Normal3f(Normalize(Cross(dpdu, dpdv)));
-	//Normal3f n1 = Normal3f(Normalize(Vector3f(pHit)));
+	Normal3f n1 = Normal3f(Normalize(Vector3f(pHit)));
 
 	//std::cout << n << ' ' << n1 << std::endl;
 
 	*isect = (*ObjectToWorld)(SurfaceInteraction(pHit, Point2f(u, v),
 		-ray.d, dpdu, dpdv, Normal3f(0, 0, 0), Normal3f(0, 0, 0),
 		ray.time, this));
-	//isect->n = isect->shading.n = (*ObjectToWorld)(n);
+	isect->n = isect->shading.n = (*ObjectToWorld)(n1);
 	*tHit = tShapeHit;
 	return true;
 }
 
 bool Sphere::IntersectP(const Ray &r, bool testAlphaTexture) const {
 
-	//Point3f pHit;
 	Ray ray = (*WorldToObject)(r);
 	//Vector3f oc = ray.o - Point3f(0.0f, 0.0f, 0.0f);
 	//// Compute quadratic sphere coefficients
 
-	//// Initialize _EFloat_ ray coordinate values
-	//Float a = Dot(ray.d, ray.d);
+	// Initialize _EFloat_ ray coordinate values
+	//Float a = Dot(ray.d,ray.d);
 	//Float b = 2.0*Dot(oc, ray.d);
 	//Float c = Dot(oc, oc) - radius * radius;
 	//Float discriminant = b * b - 4 * a*c;
@@ -123,9 +123,25 @@ bool Sphere::IntersectP(const Ray &r, bool testAlphaTexture) const {
 
 	Float discriminant = half_b * half_b - a * c;
 	if (discriminant < 0) return false;
+	//std::cout << 's' << std::endl;
 	Float sqrtd = sqrt(discriminant);
+
+	// Find the nearest root that lies in the acceptable range.
 	Float t0 = (-half_b - sqrtd) / a;
 	Float t1 = (-half_b + sqrtd) / a;
+	//std::cout << a << std::endl;
+
+	//Float ox=ray.o.x, oy=ray.o.y, oz=ray.o.z;
+	//Float dx=ray.d.x, dy=ray.d.y, dz=ray.d.z;
+	//Float a = dx * dx + dy * dy + dz * dz;
+	//Float b = 2 * (dx * ox + dy * oy + dz * oz);
+	//Float c = ox * ox + oy * oy + oz * oz - Float(radius) * Float(radius);
+
+	// Solve quadratic equation for _t_ values
+	//Float t0, t1;
+
+	//if (!Quadratic(a, b, c, &t0, &t1)) return false;
+
 	if (t0 > ray.tMax || t1 <= 0) return false;
 	Float tShapeHit = t0;
 	if (tShapeHit <= 0) {
@@ -135,18 +151,18 @@ bool Sphere::IntersectP(const Ray &r, bool testAlphaTexture) const {
 	return true;
 }
 
-Interaction Sphere::Sample(const Point2f &u, Float *pdf) const {
-	Point3f pObj = Point3f(0, 0, 0) + radius * UniformSampleSphere(u);
-	Interaction it;
-	it.n = Normalize((*ObjectToWorld)(Normal3f(pObj.x, pObj.y, pObj.z)));
-	if (reverseOrientation) it.n *= -1;
-	// Reproject _pObj_ to sphere surface and compute _pObjError_
-	pObj *= radius / Distance(pObj, Point3f(0, 0, 0));
-	Vector3f pObjError = gamma(5) * Abs((Vector3f)pObj);
-	it.p = (*ObjectToWorld)(pObj);
-	*pdf = 1 / Area();
-	return it;
-}
+//Interaction Sphere::Sample(const Point2f &u, Float *pdf) const {
+//	Point3f pObj = Point3f(0, 0, 0) + radius * UniformSampleSphere(u);
+//	Interaction it;
+//	it.n = Normalize((*ObjectToWorld)(Normal3f(pObj.x, pObj.y, pObj.z)));
+//	if (reverseOrientation) it.n *= -1;
+//	// Reproject _pObj_ to sphere surface and compute _pObjError_
+//	pObj *= radius / Distance(pObj, Point3f(0, 0, 0));
+//	Vector3f pObjError = gamma(5) * Abs((Vector3f)pObj);
+//	it.p = (*ObjectToWorld)(pObj);
+//	*pdf = 1 / Area();
+//	return it;
+//}
 
 //Interaction Sphere::Sample(const Interaction &ref, const Point2f &u,
 //	Float *pdf) const {

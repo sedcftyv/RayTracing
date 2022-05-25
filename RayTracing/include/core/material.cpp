@@ -11,13 +11,13 @@ void MatteMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,TransportM
 	// Evaluate textures for _MatteMaterial_ material and allocate BRDF
 	si->bsdf = new BSDF(*si);
 	Spectrum r = Kd->Evaluate(*si).Clamp();
-	Float sig = Clamp(sigma->Evaluate(*si), 0, 90);
-	if (!r.IsBlack()) {
-		if (sig == 0)
-			si->bsdf->Add(new LambertianReflection(r));
+	//Float sig = Clamp(sigma->Evaluate(*si), 0, 90);
+	//if (!r.IsBlack()) {
+	//	if (sig == 0)
+	si->bsdf->Add(new LambertianReflection(r));
 		//else
 		//	si->bsdf->Add(new OrenNayar(r));
-	}
+	//}
 }
 
 void MirrorMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
@@ -155,4 +155,5 @@ void MetalRoughnessMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
 			//new PBRDistribution(roughness,si->n);
 		si->bsdf->Add(new MetalRoughnessReflection(c, metallic, roughness, distrib));
 	}
+
 }

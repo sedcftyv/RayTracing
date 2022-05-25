@@ -51,6 +51,7 @@ protected:
 };
 
 class VisibilityTester {
+
 public:
 	VisibilityTester() {}
 	// VisibilityTester Public Methods

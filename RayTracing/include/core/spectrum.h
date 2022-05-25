@@ -5,7 +5,7 @@
 
 #include "pbrt.h"
 #include "stringprint.h"
-
+#include "geometry.h"
 enum class SpectrumType { Reflectance, Illuminant };
 
 inline void XYZToRGB(const Float xyz[3], Float rgb[3]) {
@@ -229,6 +229,11 @@ public:
 		this->c[0] = a;
 		this->c[1] = b;
 		this->c[2] = c;
+	}
+	RGBSpectrum(Vector3f a) {
+		this->c[0] = a[0];
+		this->c[1] = a[1];
+		this->c[2] = a[2];
 	}
 	RGBSpectrum(const CoefficientSpectrum<3> &v) : CoefficientSpectrum<3>(v) {}
 	RGBSpectrum(const RGBSpectrum &s,

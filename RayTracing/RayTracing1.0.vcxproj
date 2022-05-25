@@ -192,7 +192,6 @@
   <ItemGroup>
     <ClInclude Include="include\core\bvh.h" />
     <ClInclude Include="include\core\camera.h" />
-    <ClInclude Include="include\core\error.h" />
     <ClInclude Include="include\core\geometry.h" />
     <ClInclude Include="include\core\imageio.h" />
     <ClInclude Include="include\core\imagemap.h" />
@@ -216,16 +215,15 @@
     <ClInclude Include="include\core\spectrum.h" />
     <ClInclude Include="include\core\sphere.h" />
     <ClInclude Include="include\core\stratified.h" />
-    <ClInclude Include="include\core\stringprint.h" />
     <ClInclude Include="include\core\texture.h" />
     <ClInclude Include="include\core\transform.h" />
     <ClInclude Include="include\core\triangle.h" />
     <ClInclude Include="include\ext\lodepng.h" />
-    <ClInclude Include="include\rtweekend.h" />
     <ClInclude Include="include\rtw_stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram21.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

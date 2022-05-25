@@ -1,0 +1,396 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BVHAccel" Collapsed="true">
+    <Position X="10.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACBQAAABAAAAAAAQEgAAABgAAAAAAAAQAAAAAIAA=</HashCode>
+      <FileName>include\core\bvh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Camera" Collapsed="true">
+    <Position X="5.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAQAAIAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ProjectiveCamera" Collapsed="true">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAACAAECAAAAAAAAAAQAAAAAAQAAAAQAA=</HashCode>
+      <FileName>include\core\camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PerspectiveCamera" Collapsed="true">
+    <Position X="5.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAIA=</HashCode>
+      <FileName>include\core\camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vector3&lt;T&gt;" Collapsed="true">
+    <Position X="14.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAQBAAAEAAAAAAABgAQACAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Point3&lt;T&gt;" Collapsed="true">
+    <Position X="12.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAQAAAAEAAAAAAAFgAQACAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Normal3&lt;T&gt;" Collapsed="true">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQBAAAEAAAAAAABgAQACEAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Ray" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAACAAAEAAAAAAAAAAAAAAECAAAAAACAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Bounds3&lt;T&gt;" Collapsed="true">
+    <Position X="11" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAIgCAAAAUAAAwAAKAEIAAAAgAIAAAAAgAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ImageTexture&lt;Tmemory, Treturn&gt;" Collapsed="true">
+    <Position X="11" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAEAAAAAARQAAAgAAAQAAAAAAAAAACAQAAAA=</HashCode>
+      <FileName>include\core\imagemap.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Integrator" Collapsed="true">
+    <Position X="2.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>include\core\integrator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SamplerIntegrator" Collapsed="true">
+    <Position X="2.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAoAIAgAAAAEBIAAAAAAAABAAAAAAABAAAAAAABA=</HashCode>
+      <FileName>include\core\integrator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathIntegrator" Collapsed="true">
+    <Position X="2.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAABIAAACAAACAAgAAABAAAAAQAAAAA=</HashCode>
+      <FileName>include\core\integrator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SurfaceInteraction" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAgADAAAEBKQBAAAIAAAAACAHAAAAAAACAAACBgQ=</HashCode>
+      <FileName>include\core\interaction.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Light" Collapsed="true">
+    <Position X="4" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABgAAAAIAAAAAKCBAAAAAgAAAAAAAAgBAAAAAAAAAAQ=</HashCode>
+      <FileName>include\core\light.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisibilityTester" Collapsed="true">
+    <Position X="14.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAECAAABAkIAAAAAAAAA=</HashCode>
+      <FileName>include\core\light.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AreaLight" Collapsed="true">
+    <Position X="4" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAA=</HashCode>
+      <FileName>include\core\light.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DiffuseAreaLight" Collapsed="true">
+    <Position X="4" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAAARAAAAgBAAAAAAQABAE=</HashCode>
+      <FileName>include\core\light.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightDistribution" Collapsed="true">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\lightdistrib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniformLightDistribution" Collapsed="true">
+    <Position X="0.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAIAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\lightdistrib.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Material" Collapsed="true">
+    <Position X="2.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MatteMaterial" Collapsed="true">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAgAAAAAAIAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MirrorMaterial" Collapsed="true">
+    <Position X="2.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAgAAgAAAAAA=</HashCode>
+      <FileName>include\core\material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MetalRoughnessMaterial" Collapsed="true">
+    <Position X="4" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAEAIAAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\material.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MicrofacetDistribution" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwABAAAAAAAABAEAAEAAAAAAAAAAAAMAAAADAAAAAA=</HashCode>
+      <FileName>include\core\microfacet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TrowbridgeReitzDistribution" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAABAEAAAAAAAAAAAAAAAAAAAUBAAAAAA=</HashCode>
+      <FileName>include\core\microfacet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModelLoad" Collapsed="true">
+    <Position X="11" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAQAAAAAAQAAwAAACAAAIAAAAAAAACAAAAABAAAgA=</HashCode>
+      <FileName>include\core\modelload.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Primitive" Collapsed="true">
+    <Position X="9" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAFQACAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>include\core\primitive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GeometricPrimitive" Collapsed="true">
+    <Position X="9" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAFQACAAAAAAAAAAMAAAAAAAAAAAAAkAAAABABAA=</HashCode>
+      <FileName>include\core\primitive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Aggregate" Collapsed="true">
+    <Position X="10.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAACAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\primitive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BxDF" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAEAgAAAAAAABABAAQRAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\reflection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BSDF" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIABAAAAAAAACAAAgAAAACAABQAEgATgggAEAIAAAA=</HashCode>
+      <FileName>include\core\reflection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LambertianReflection" Collapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARAACAAAAAAQA=</HashCode>
+      <FileName>include\core\reflection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpecularReflection" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgABAAAAAAAAAAEAgAAAAAAAAAAAAAQAAAAAgAAAQI=</HashCode>
+      <FileName>include\core\reflection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MetalRoughnessReflection" Collapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAIIAAAAAAAgAEAEAAAAAAAACQAABAAAAAAAA=</HashCode>
+      <FileName>include\core\reflection.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Distribution2D" Collapsed="true">
+    <Position X="14.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAghA=</HashCode>
+      <FileName>include\core\sampling.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Scene" Collapsed="true">
+    <Position X="11" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAABQAAQAABAAAgAAEAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\scene.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Shape" Collapsed="true">
+    <Position X="5.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEBBQAAAAAAAYAAAIMAABBAAAAAAAAAAAAIQAAAAA=</HashCode>
+      <FileName>include\core\shape.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CoefficientSpectrum&lt;nSpectrumSamples&gt;" Collapsed="true">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAABAAAAAABEAAAAAQAgAAEAAACgAAAgQAEGAAA=</HashCode>
+      <FileName>include\core\spectrum.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RGBSpectrum" Collapsed="true">
+    <Position X="7.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAABAAABAAAAgAQAAAIg=</HashCode>
+      <FileName>include\core\spectrum.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sphere" Collapsed="true">
+    <Position X="7.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQACAAAAAQAAAQEAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>include\core\sphere.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Texture&lt;T&gt;" Collapsed="true">
+    <Position X="9.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ConstantTexture&lt;T&gt;" Collapsed="true">
+    <Position X="9.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAgAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Transform" Collapsed="true">
+    <Position X="12.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEIAAAAAAAAAEAAACQQAABIAAAAAAgQgAAAEAAA=</HashCode>
+      <FileName>include\core\transform.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Triangle" Collapsed="true">
+    <Position X="5.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABQAAAAABAQJAAAEAABAAAABAAAAABAAAQAAAAA=</HashCode>
+      <FileName>include\core\triangle.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Interaction" Collapsed="true">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAACABAAAAAAAABAAACAAAAAAEEAQAAAAAAA=</HashCode>
+      <FileName>include\core\interaction.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Distribution1D" Collapsed="true">
+    <Position X="7.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAgAIAAAAQAACAAAAEAAAAAAAAIABA=</HashCode>
+      <FileName>include\core\sampling.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="TriangleMesh" Collapsed="true">
+    <Position X="7.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAEAAAAAAAAAAEMAAEAAAAkA=</HashCode>
+      <FileName>include\core\triangle.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="Vector3f" Collapsed="true">
+    <Position X="14.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Vector3i" Collapsed="true">
+    <Position X="14.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Point3f" Collapsed="true">
+    <Position X="12.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Point3i" Collapsed="true">
+    <Position X="12.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Normal3f" Collapsed="true">
+    <Position X="9.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Bounds3f" Collapsed="true">
+    <Position X="11" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Bounds3i" Collapsed="true">
+    <Position X="11" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\geometry.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="Spectrum" Collapsed="true">
+    <Position X="7.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\core\pbrt.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

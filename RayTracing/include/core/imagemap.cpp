@@ -54,14 +54,15 @@ MIPMap<Tmemory> *ImageTexture<Tmemory, Treturn>::GetTexture(
 	return mipmap;
 }
 
+
 template <typename Tmemory, typename Treturn>
 ImageTexture<Tmemory, Treturn>::ImageTexture(
 	std::unique_ptr<TextureMapping2D> mapping, const std::string &filename,
-	bool doTrilinear, Float maxAniso, ImageWrap wrapMode, Float scale,
-	bool gamma)
+	bool doTrilinear, Float maxAniso, ImageWrap wrapMode, Float scale,bool gamma)
 	: mapping(std::move(mapping)) {
 	mipmap = GetTexture(filename, doTrilinear, maxAniso, wrapMode, scale, gamma);
 }
+
 
 template class ImageTexture<Float, Float>;
 template class ImageTexture<RGBSpectrum, Spectrum>;

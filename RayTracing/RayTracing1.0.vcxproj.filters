@@ -95,16 +95,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\rtweekend.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\rtw_stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\core\pbrt.h">
-      <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\core\error.h">
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="include\core\geometry.h">
@@ -170,9 +164,6 @@
     <ClInclude Include="include\core\light.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="include\core\stringprint.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="include\core\lightdistrib.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -197,5 +188,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram21.cd" />
   </ItemGroup>
 </Project>
