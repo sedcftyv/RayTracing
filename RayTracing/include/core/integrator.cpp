@@ -601,7 +601,9 @@ void SamplerIntegrator::render_pixel(int nowpos)
 	Point2i pixel = Point2i(i, j);
 	pixel_sampler->StartPixel(pixel);
 	Spectrum colObj(0.0);
+	//int cnt = 0;
 	do {
+		//cnt++;
 		Ray r;
 		CameraSample cs;
 		cs = pixel_sampler->GetCameraSample(pixel);
@@ -613,8 +615,8 @@ void SamplerIntegrator::render_pixel(int nowpos)
 		//colObj += Li(r, *sc, *pixel_sampler, 0);
 		perfectspecular = false;
 		colObj += Li_re(r, *sc, *pixel_sampler, 0);
-
 	} while (pixel_sampler->StartNextSample());
+	//cout << cnt << endl;
 	//cout << i<<' '<<j<<' '<<colObj << endl;
 	if (colObj.HasNaNs())
 	{
@@ -631,6 +633,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 	//Preprocess(scene, *sampler);
 	data = new unsigned char[image_height*image_width*3];
 	maxpos = image_height * image_width;
+	clock_t start = clock(), end;
 	if (thread_count == 1)
 	{
 		for (int j = 0; j < image_height; j++) {
@@ -638,7 +641,7 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 				cout << j << endl;
 			for (int i = 0; i < image_width; i++) {
 				//cout << j << ' ' << i << endl;
-				i = 445; j = 400;
+				//i = 445; j = 400;
 				//if (j < 85 || j>90 || i < 86 || i>90)
 				//{
 				//	Spectrum colObj(1.0f,0.0f,0.0f);
@@ -659,24 +662,26 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 					//float tHit;
 					SurfaceInteraction  isect;
 					colObj += Li_re(r, *sc, *pixel_sampler, 0);
-
 				} while (pixel_sampler->StartNextSample());
-				cout << i<<' '<<j<<' '<<colObj << ' '<< pixel_sampler->samplesPerPixel<<endl;
+				//cout << i<<' '<<j<<' '<<colObj << ' '<< pixel_sampler->samplesPerPixel<<endl;
 				if (colObj.HasNaNs())
 				{
 					cout << 'h'<<' '<<i << ' ' << j << ' ' << colObj << endl;
 					//colObj[0] = colObj[1] = colObj[2] = 1.0f;
 				}
-				else if (colObj.IsBlack())
-				{
-					cout << 'b' << ' ' << i << ' ' << j << ' ' << colObj << endl;
-				}
+				//else if (colObj.IsBlack())
+				//{
+				//	cout << 'b' << ' ' << i << ' ' << j << ' ' << colObj << endl;
+				//}
 				colObj = colObj / pixel_sampler->samplesPerPixel;
-				cout << i << ' ' << j << ' ' << colObj << endl;
+				//cout << i << ' ' << j << ' ' << colObj << endl;
 				write_color(colObj, 1, data, j, i, iw);
-				return;
+				//return;
 			}
 		}
+		end = clock();
+		double t = (double)(end - start) / CLOCKS_PER_SEC;
+		cout << t << endl;
 		stbi_write_png("image.png", image_width, image_height, 3, data, 0);
 		std::cerr << "\nDone.\n";
 		return;
@@ -710,6 +715,9 @@ void SamplerIntegrator::Render(const Scene &scene,int image_width,int image_heig
 	}
 	for (int i = 0; i < pool.size(); ++i)
 		pool[i].join();
+	end = clock();
+	double t = (double)(end - start) / CLOCKS_PER_SEC;
+	cout << t << endl;
 	stbi_write_png("image.png", image_width, image_height, 3, data, 0);
 	std::cerr << "\nDone.\n";
 	return;

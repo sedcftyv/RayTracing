@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <fstream>
+#include <time.h>
 #include "rtweekend.h"
 #include "core/geometry.h"
 #include "core/transform.h"
@@ -109,7 +110,7 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	std::vector<std::shared_ptr<Shape>> meshAreaLight = CreateTriangleMesh(tri_Object2World_AreaLight, tri_World2Object_AreaLight, false, nTrianglesAreaLight, vertexIndicesAreaLight, nVerticesAreaLight, P_AreaLight, nullptr, nullptr, nullptr, nullptr);
 	for (int i = 0; i < nTrianglesAreaLight; ++i)
 	{
-		area = make_shared<DiffuseAreaLight>(*tri_Object2World_AreaLight, Spectrum(15.f), 1, meshAreaLight[i], false);
+		area = make_shared<DiffuseAreaLight>(*tri_Object2World_AreaLight, Spectrum(20.f), 1, meshAreaLight[i], false);
 		lights.push_back(area);
 		prims.push_back(make_shared<GeometricPrimitive>(meshAreaLight[i], m1, area));
 	}
@@ -121,6 +122,7 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	//shared_ptr<Light>infinityLight = make_shared<InfiniteAreaLight>(InfinityLightToWorld, power, 10, hdrFile);
 	//lights.push_back(infinityLight);
 
+	shared_ptr<Material> mirror = make_shared<MirrorMaterial>(make_shared<ConstantTexture<Spectrum>>(Spectrum(1.f)));
 	Transform *tri_Object2World=new Transform, *tri_World2Object=new Transform;
 	const int nTrianglesFloor = 10;
 	const int nVerticesFloor = nTrianglesFloor*3;
@@ -174,6 +176,7 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	for (int i = 0; i < nVerticesCube; ++i)
 		vertexIndicesCube[i] = i;
 	Float height = 1.2f;
+	height = 1.486f;
 	Point3f P_Cube[nVerticesCube] = {
 		//底座
 		Point3f(0.f,0.f,height),Point3f(height,0.f,height),Point3f(0.f,0.f,0.f),
@@ -198,45 +201,49 @@ void Cornellbox(shared_ptr<Scene> &scene, Transform &lookat)
 	for (int i = 0; i < nTrianglesCube; ++i)
 			prims.push_back(make_shared<GeometricPrimitive>(meshCube[i], mwhite, nullptr));
 
-	//tri_Object2World = new Transform, tri_World2Object = new Transform;
-	//*tri_Object2World = Translate(Vector3f(2.7f, 0.f, 1.0f))*RotateY(-15)*(*tri_Object2World);
-	//*tri_World2Object = Inverse(*tri_Object2World);
-	//const int nTrianglesRect = 12;
-	//const int nVerticesRect = nTrianglesRect * 3;
-	//int vertexIndicesRect[nVerticesRect];
-	//for (int i = 0; i < nVerticesRect; ++i)
-	//	vertexIndicesRect[i] = i;
-	//Float width = height * 2;
-	//Point3f P_Rect[nVerticesRect] = {
-	//	//底座
-	//	Point3f(0.f,0.f,height),Point3f(height,0.f,height),Point3f(0.f,0.f,0.f),
-	//	Point3f(height,0.f,height),Point3f(height,0.f,0.f),Point3f(0.f,0.f,0.f),
-	//	//天花板
-	//	Point3f(0.f,height,height),Point3f(0.f,height,0.f),Point3f(height,height,height),
-	//	Point3f(height,height,height),Point3f(0.f,height,0.f),Point3f(height,height,0.f),
-	//	//后墙
-	//	Point3f(0.f,0.f,0.f),Point3f(height,0.f,0.f),Point3f(height,width,0.f),
-	//	Point3f(0.f,0.f,0.f),Point3f(height,width,0.f),Point3f(0.f,width,0.f),
-	//	//右墙
-	//	Point3f(0.f,0.f,0.f),Point3f(0.f,width,height),Point3f(0.f,0.f,height),
-	//	Point3f(0.f,0.f,0.f),Point3f(0.f,width,0.f),Point3f(0.f,width,height),
-	//	//左墙
-	//	Point3f(height,0.f,0.f),Point3f(height,width,height),Point3f(height,0.f,height),
-	//	Point3f(height,0.f,0.f),Point3f(height,width,0.f),Point3f(height,width,height),
-	//	//前墙
-	//	Point3f(0.f,0.f,height),Point3f(height,0.f,height),Point3f(height,width,height),
-	//	Point3f(0.f,0.f,height),Point3f(height,width,height),Point3f(0.f,width,height),
-	//};
-	//std::vector<std::shared_ptr<Shape>> meshRect = CreateTriangleMesh(tri_Object2World, tri_World2Object, false, nTrianglesRect, vertexIndicesRect, nVerticesRect, P_Rect, nullptr, nullptr, nullptr, nullptr);
-	//for (int i = 0; i < nTrianglesRect; ++i)
-	//	prims.push_back(make_shared<GeometricPrimitive>(meshRect[i], mwhite, nullptr));
+	tri_Object2World = new Transform, tri_World2Object = new Transform;
+	*tri_Object2World = Translate(Vector3f(2.7f, 0.f, 1.0f))*RotateY(-15)*(*tri_Object2World);
+	*tri_World2Object = Inverse(*tri_Object2World);
+	const int nTrianglesRect = 12;
+	const int nVerticesRect = nTrianglesRect * 3;
+	int vertexIndicesRect[nVerticesRect];
+	for (int i = 0; i < nVerticesRect; ++i)
+		vertexIndicesRect[i] = i;
+	Float width = height * 2;
+	Point3f P_Rect[nVerticesRect] = {
+		//底座
+		Point3f(0.f,0.f,height),Point3f(height,0.f,height),Point3f(0.f,0.f,0.f),
+		Point3f(height,0.f,height),Point3f(height,0.f,0.f),Point3f(0.f,0.f,0.f),
+		//天花板
+		Point3f(0.f,height,height),Point3f(0.f,height,0.f),Point3f(height,height,height),
+		Point3f(height,height,height),Point3f(0.f,height,0.f),Point3f(height,height,0.f),
+		//后墙
+		Point3f(0.f,0.f,0.f),Point3f(height,0.f,0.f),Point3f(height,width,0.f),
+		Point3f(0.f,0.f,0.f),Point3f(height,width,0.f),Point3f(0.f,width,0.f),
+		//右墙
+		Point3f(0.f,0.f,0.f),Point3f(0.f,width,height),Point3f(0.f,0.f,height),
+		Point3f(0.f,0.f,0.f),Point3f(0.f,width,0.f),Point3f(0.f,width,height),
+		//左墙
+		Point3f(height,0.f,0.f),Point3f(height,width,height),Point3f(height,0.f,height),
+		Point3f(height,0.f,0.f),Point3f(height,width,0.f),Point3f(height,width,height),
+		//前墙
+		Point3f(0.f,0.f,height),Point3f(height,0.f,height),Point3f(height,width,height),
+		Point3f(0.f,0.f,height),Point3f(height,width,height),Point3f(0.f,width,height),
+	};
+	std::vector<std::shared_ptr<Shape>> meshRect = CreateTriangleMesh(tri_Object2World, tri_World2Object, false, nTrianglesRect, vertexIndicesRect, nVerticesRect, P_Rect, nullptr, nullptr, nullptr, nullptr);
+	for (int i = 0; i < nTrianglesRect; ++i)
+	{
+		if(i<10)
+			prims.push_back(make_shared<GeometricPrimitive>(meshRect[i], mwhite, nullptr));
+		else
+			prims.push_back(make_shared<GeometricPrimitive>(meshRect[i], mwhite, nullptr));
+	}
 
-	shared_ptr<Material> mirror = make_shared<MirrorMaterial>(make_shared<ConstantTexture<Spectrum>>(Spectrum(1.f)));
-	Transform *tri_ObjectWorldModel = new Transform, *tri_WorldObjectModel = new Transform;
-	*tri_ObjectWorldModel = Translate(Vector3f(3.5f, 1.2f, 1.8f))*(*tri_ObjectWorldModel);
-	*tri_WorldObjectModel = Inverse(*tri_ObjectWorldModel);
-	std::shared_ptr<Shape> sphere = make_shared<Sphere>(tri_ObjectWorldModel, tri_WorldObjectModel, false, 1.2f);
-	prims.push_back(make_shared<GeometricPrimitive>(sphere, mirror, nullptr));
+	//Transform *tri_ObjectWorldModel = new Transform, *tri_WorldObjectModel = new Transform;
+	//*tri_ObjectWorldModel = Translate(Vector3f(3.5f, 1.2f, 1.8f))*(*tri_ObjectWorldModel);
+	//*tri_WorldObjectModel = Inverse(*tri_ObjectWorldModel);
+	//std::shared_ptr<Shape> sphere = make_shared<Sphere>(tri_ObjectWorldModel, tri_WorldObjectModel, false, 1.2f);
+	//prims.push_back(make_shared<GeometricPrimitive>(sphere, mirror, nullptr));
 
 	scene=make_shared<Scene>(make_shared<BVHAccel>(prims), lights);
 
@@ -543,28 +550,34 @@ int main()
 {
 	std::shared_ptr<Scene>worldScene;
 	Transform lookat;
-	//Cornellbox(worldScene, lookat);
+	Cornellbox(worldScene, lookat);
 	//MetalRoughSphere(worldScene,lookat);
 	//DamagedHelmet(worldScene, lookat);
 	//sphere(worldScene, lookat);
 	//sphere1(worldScene, lookat);
-	Sponza(worldScene, lookat);
+	//Sponza(worldScene, lookat);
 	Transform Camera2World = Inverse(lookat);
 
 	int resolution = 1440;
-	resolution = 400;
+	resolution = 800;
 	int image_width= resolution, image_height= resolution;
 	Float focaldistance = 0.01f;
-	Float fov = 90.0f;
+	Float fov = 40.0f;
+	//fov = 90.0f;
 	shared_ptr<Camera> cam = shared_ptr<Camera>(CreatePerspectiveCamera(Camera2World, focaldistance,fov,image_width, image_height));
 	
-	int spp = 4;
+	int spp = 3;
 	shared_ptr<Sampler> ss = make_unique<StratifiedSampler>(spp, spp,true,1);
 	Bounds2i pixelBounds;
 	//shared_ptr<Integrator>wSI=make_shared<WhittedIntegrator>(5,cam,ss, pixelBounds);
 	shared_ptr<Integrator>pSI = make_shared<PathIntegrator>(50, cam, ss, pixelBounds,1.f);
 
+	//clock_t start=clock(), end;
 	pSI->Render(*worldScene, image_width, image_height);
+	//end = clock();
+	//double t = (double)(end - start) / CLOCKS_PER_SEC;
+	//cout << t << endl;
+	//std::cerr << "\nDone.\n";
 	//cout << worldScene.use_count() << endl;
 	return 0;
 }

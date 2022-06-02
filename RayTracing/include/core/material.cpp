@@ -148,6 +148,8 @@ void MetalRoughnessMaterial::ComputeScatteringFunctions(SurfaceInteraction *si,
 	{
 		Spectrum tmp = metalroughness->Evaluate(*si).Clamp();
 		Float metallic = tmp[2], roughness = std::max(0.05f,tmp[1]);
+		//metallic = 1.f;
+		//roughness = 0.05f;
 		//metallic = 1.0; roughness = 0.05;
 		MicrofacetDistribution *distrib =
 			new TrowbridgeReitzDistribution(roughness, roughness);

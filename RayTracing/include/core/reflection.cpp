@@ -363,6 +363,7 @@ Spectrum MetalRoughnessReflection::Sample_f(const Vector3f &wo, Vector3f *wi,
 
 	// Compute PDF of _wi_ for microfacet reflection
 	*pdf = distribution->Pdf(wo, wh) / (4 * Dot(wo, wh));
+	//std::cout << *pdf << std::endl;
 	return f(wo, *wi);
 }
 
