@@ -7,7 +7,6 @@
 #include "geometry.h"
 #include "transform.h"
 #include "material.h"
-//#include "reflection.h"
 
 struct Interaction {
 	Interaction() :time(0) { }
@@ -35,16 +34,12 @@ struct Interaction {
 		: p(p), time(time), wo(wo){ }
 	Interaction(const Point3f &p, Float time)
 		: p(p), time(time){ }
-	//bool IsMediumInteraction() const { return !IsSurfaceInteraction(); }
-
-	//<< Interaction Public Data >>
+	
 	Point3f p;
 	Float time;
-	//Vector3f pError;
-	Vector3f wo;
+		Vector3f wo;
 	Normal3f n;
-	//MediumInterface mediumInterface;
-};
+	};
 
 class SurfaceInteraction : public Interaction {
 public:
@@ -56,12 +51,10 @@ public:
 	~SurfaceInteraction();
 	void SetShadingGeometry(const Vector3f &dpdu, const Vector3f &dpdv,
 		const Normal3f &dndu, const Normal3f &dndv, bool orientationIsAuthoritative);
-	//void ComputeScatteringFunctions(const RayDifferential &ray,MemoryArena &arena, bool allowMultipleLobes = false);
-	void ComputeScatteringFunctions(
+		void ComputeScatteringFunctions(
 		const Ray &ray, bool allowMultipleLobes = false,
 		TransportMode mode = TransportMode::Radiance);
-	//void ComputeDifferentials(const RayDifferential &r) const;
-	Spectrum Le(const Vector3f &w) const;
+		Spectrum Le(const Vector3f &w) const;
 
 	Point2f uv;
 	Vector3f dpdu, dpdv;
@@ -74,7 +67,6 @@ public:
 	} shading;
 	const Primitive *primitive = nullptr;
 	BSDF *bsdf = nullptr;
-	//BSSRDF *bssrdf = nullptr;
 	mutable Vector3f dpdx, dpdy;
 	mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
 	int faceIndex = 0;

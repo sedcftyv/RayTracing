@@ -11,7 +11,6 @@ inline void stringPrintfRecursive(std::string *s, const char *fmt) {
 	// specifiers.
 	while (*c) {
 		if (*c == '%') {
-			CHECK_EQ(c[1], '%');
 			++c;
 		}
 		*s += *c++;

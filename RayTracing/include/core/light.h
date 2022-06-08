@@ -6,8 +6,6 @@
 #include "interaction.h"
 #include "spectrum.h"
 
-
-
 enum class LightFlags : int {
 	DeltaPosition = 1,
 	DeltaDirection = 2,
@@ -16,13 +14,11 @@ enum class LightFlags : int {
 };
 
 inline bool IsDeltaLight(int flags) {
-	return flags & (int)LightFlags::DeltaPosition ||
-		flags & (int)LightFlags::DeltaDirection;
+	return flags & (int)LightFlags::DeltaPosition ||flags & (int)LightFlags::DeltaDirection;
 }
 
 class Light {
 public:
-	// Light Interface
 	virtual ~Light();
 	Light(int flags, const Transform &LightToWorld, int nSamples = 1);
 	virtual Spectrum Sample_Li(const Interaction &ref, const Point2f &u,
@@ -40,23 +36,18 @@ public:
 	virtual void Pdf_Le(const Ray &ray, const Normal3f &nLight, Float *pdfPos,
 		Float *pdfDir) const = 0;
 
-	// Light Public Data
-	const int flags;
+		const int flags;
 	const int nSamples;
-	//const MediumInterface mediumInterface;
-
+	
 protected:
-	// Light Protected Data
-	const Transform LightToWorld, WorldToLight;
+		const Transform LightToWorld, WorldToLight;
 };
 
 class VisibilityTester {
 
 public:
 	VisibilityTester() {}
-	// VisibilityTester Public Methods
-	VisibilityTester(const Interaction &p0, const Interaction &p1)
-		: p0(p0), p1(p1) {}
+	VisibilityTester(const Interaction &p0, const Interaction &p1): p0(p0), p1(p1) {}
 	const Interaction &P0() const { return p0; }
 	const Interaction &P1() const { return p1; }
 	bool Unoccluded(const Scene &scene) const;
@@ -70,17 +61,15 @@ private:
 
 class AreaLight : public Light {
 public:
-	// AreaLight Interface
 	AreaLight(const Transform &LightToWorld,int nSamples);
 	virtual Spectrum L(const Interaction &intr, const Vector3f &w) const = 0;
 };
 
 class DiffuseAreaLight : public AreaLight {
 public:
-	// DiffuseAreaLight Public Methods
 	DiffuseAreaLight(const Transform &LightToWorld, const Spectrum &Le,
-		int nSamples, const std::shared_ptr<Shape> &shape,
-		bool twoSided = false);
+	int nSamples, const std::shared_ptr<Shape> &shape,
+	bool twoSided = false);
 	Spectrum L(const Interaction &intr, const Vector3f &w) const {
  		return (twoSided || Dot(intr.n, w) > 0) ? Lemit : Spectrum(0.f);
 	}
@@ -89,18 +78,12 @@ public:
 		Float *pdf, VisibilityTester *vis) const;
 	Float Pdf_Li(const Interaction &, const Vector3f &) const;
 	Spectrum Sample_Le(const Point2f &u1, const Point2f &u2, Float time,
-		Ray *ray, Normal3f *nLight, Float *pdfPos,
-		Float *pdfDir) const;
-	void Pdf_Le(const Ray &, const Normal3f &, Float *pdfPos,
-		Float *pdfDir) const;
+		Ray *ray, Normal3f *nLight, Float *pdfPos,Float *pdfDir) const;
+	void Pdf_Le(const Ray &, const Normal3f &, Float *pdfPos,Float *pdfDir) const;
 
 protected:
-	// DiffuseAreaLight Protected Data
 	const Spectrum Lemit;
 	std::shared_ptr<Shape> shape;
-	// Added after book publication: by default, DiffuseAreaLights still
-	// only emit in the hemimsphere around the surface normal.  However,
-	// this behavior can now be overridden to give emission on both sides.
 	const bool twoSided;
 	const Float area;
 };

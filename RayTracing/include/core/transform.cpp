@@ -39,8 +39,7 @@ Matrix4x4 Inverse(const Matrix4x4 &m) {
 	for (int i = 0; i < 4; i++) {
 		int irow = 0, icol = 0;
 		Float big = 0.f;
-		// Choose pivot
-		for (int j = 0; j < 4; j++) {
+				for (int j = 0; j < 4; j++) {
 			if (ipiv[j] != 1) {
 				for (int k = 0; k < 4; k++) {
 					if (ipiv[k] == 0) {
@@ -56,21 +55,16 @@ Matrix4x4 Inverse(const Matrix4x4 &m) {
 			}
 		}
 		++ipiv[icol];
-		// Swap rows _irow_ and _icol_ for pivot
-		if (irow != icol) {
+			if (irow != icol) {
 			for (int k = 0; k < 4; ++k) std::swap(minv[irow][k], minv[icol][k]);
 		}
 		indxr[i] = irow;
 		indxc[i] = icol;
 		if (minv[icol][icol] == 0.f) printf("Singular matrix in MatrixInvert\n");
-
-		// Set m[icol][icol] to one by scaling row _icol_ appropriately
 		Float pivinv = 1. / minv[icol][icol];
 		minv[icol][icol] = 1.;
 		for (int j = 0; j < 4; j++) minv[icol][j] *= pivinv;
-
-		// Subtract this row from others to zero out their columns
-		for (int j = 0; j < 4; j++) {
+			for (int j = 0; j < 4; j++) {
 			if (j != icol) {
 				Float save = minv[j][icol];
 				minv[j][icol] = 0;
@@ -78,8 +72,7 @@ Matrix4x4 Inverse(const Matrix4x4 &m) {
 			}
 		}
 	}
-	// Swap columns to reflect permutation
-	for (int j = 3; j >= 0; j--) {
+		for (int j = 3; j >= 0; j--) {
 		if (indxr[j] != indxc[j]) {
 			for (int k = 0; k < 4; k++)
 				std::swap(minv[k][indxr[j]], minv[k][indxc[j]]);
@@ -136,13 +129,11 @@ Transform Rotate(Float theta, const Vector3f &axis) {
 	Float sinTheta = std::sin(Radians(theta));
 	Float cosTheta = std::cos(Radians(theta));
 	Matrix4x4 m;
-	// Compute rotation of first basis vector
 	m.m[0][0] = a.x * a.x + (1 - a.x * a.x) * cosTheta;
 	m.m[0][1] = a.x * a.y * (1 - cosTheta) - a.z * sinTheta;
 	m.m[0][2] = a.x * a.z * (1 - cosTheta) + a.y * sinTheta;
 	m.m[0][3] = 0;
 
-	// Compute rotations of second and third basis vectors
 	m.m[1][0] = a.x * a.y * (1 - cosTheta) + a.z * sinTheta;
 	m.m[1][1] = a.y * a.y + (1 - a.y * a.y) * cosTheta;
 	m.m[1][2] = a.y * a.z * (1 - cosTheta) - a.x * sinTheta;
@@ -157,21 +148,18 @@ Transform Rotate(Float theta, const Vector3f &axis) {
 
 Transform LookAt(const Point3f &pos, const Point3f &look, const Vector3f &up) {
 	Matrix4x4 cameraToWorld;
-	// Initialize fourth column of viewing matrix
 	cameraToWorld.m[0][3] = pos.x;
 	cameraToWorld.m[1][3] = pos.y;
 	cameraToWorld.m[2][3] = pos.z;
 	cameraToWorld.m[3][3] = 1;
 
-	// Initialize first three columns of viewing matrix
 	Vector3f dir = Normalize(look - pos);
 	if (Cross(Normalize(up), dir).Length() == 0) {
 		printf(
 			" vector and viewing direction"
 			"passed to LookAt are pointing in the same direction.  Using "
 			"the identity transformation.\n");
-			//up.x, up.y, up.z, dir.x, dir.y, dir.z);
-		return Transform();
+					return Transform();
 	}
 	Vector3f right = Normalize(Cross(Normalize(up), dir));
 	Vector3f newUp = Cross(dir, right);
@@ -216,15 +204,12 @@ bool Transform::SwapsHandedness() const {
 
 SurfaceInteraction Transform::operator()(const SurfaceInteraction &si) const {
 	SurfaceInteraction ret;
-	// Transform _p_ and _pError_ in _SurfaceInteraction_
 	ret.p = (*this)(si.p);
 
-	// Transform remaining members of _SurfaceInteraction_
 	const Transform &t = *this;
 	ret.n = Normalize(t(si.n));
 	ret.wo = Normalize(t(si.wo));
 	ret.time = si.time;
-	//ret.mediumInterface = si.mediumInterface;
 	ret.uv = si.uv;
 	ret.shape = si.shape;
 	ret.dpdu = t(si.dpdu);
@@ -243,9 +228,7 @@ SurfaceInteraction Transform::operator()(const SurfaceInteraction &si) const {
 	ret.dpdx = t(si.dpdx);
 	ret.dpdy = t(si.dpdy);
 	ret.bsdf = si.bsdf;
-	//ret.bssrdf = si.bssrdf;
 	ret.primitive = si.primitive;
-	//ret.n = Faceforward(ret.n, ret.shading.n);
 	ret.shading.n = Faceforward(ret.shading.n, ret.n);
 	ret.faceIndex = si.faceIndex;
 	return ret;
@@ -256,13 +239,10 @@ Transform Orthographic(Float zNear, Float zFar) {
 }
 
 Transform Perspective(Float fov, Float n, Float f) {
-	// Perform projective divide for perspective projection
-	Matrix4x4 persp(1, 0, 0, 0, 
+		Matrix4x4 persp(1, 0, 0, 0, 
 					0, 1, 0, 0, 
 					0, 0, f / (f - n), -f * n / (f - n),
 					0, 0, 1, 0);
-
-	// Scale canonical perspective view to specified field of view
-	Float invTanAng = 1 / std::tan(Radians(fov) / 2);
+		Float invTanAng = 1 / std::tan(Radians(fov) / 2);
 	return Scale(invTanAng, invTanAng, 1) * Transform(persp);
 }

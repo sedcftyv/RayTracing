@@ -7,8 +7,7 @@ UVMapping2D::UVMapping2D(Float su, Float sv, Float du, Float dv)
 
 Point2f UVMapping2D::Map(const SurfaceInteraction &si, Vector2f *dstdx,
 	Vector2f *dstdy) const {
-	// Compute texture differentials for 2D identity mapping
-	*dstdx = Vector2f(su * si.dudx, sv * si.dvdx);
+		*dstdx = Vector2f(su * si.dudx, sv * si.dvdx);
 	*dstdy = Vector2f(su * si.dudy, sv * si.dvdy);
 	return Point2f(su * si.uv[0] + du, sv * si.uv[1] + dv);
 }

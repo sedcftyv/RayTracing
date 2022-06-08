@@ -36,10 +36,8 @@ struct TexInfo {
 template <typename Tmemory, typename Treturn>
 class ImageTexture : public Texture<Treturn> {
 public:
-	// ImageTexture Public Methods
 	ImageTexture(std::unique_ptr<TextureMapping2D> mapping, const std::string &filename, bool doTrilinear, Float maxAniso,
-		ImageWrap wrapMode, Float scale, bool gamma);
-
+	ImageWrap wrapMode, Float scale, bool gamma);
 	static void ClearCache() {
 		textures.erase(textures.begin(), textures.end());
 	}
@@ -52,10 +50,9 @@ public:
 		return ret;
 	}
 private:
-	// ImageTexture Private Methods
 	static MIPMap<Tmemory> *GetTexture(const std::string &filename,
-		bool doTrilinear, Float maxAniso,
-		ImageWrap wrap, Float scale, bool gamma);
+	bool doTrilinear, Float maxAniso,
+	ImageWrap wrap, Float scale, bool gamma);
 
 	static void convertIn(const RGBSpectrum &from, RGBSpectrum *to, Float scale,
 		bool gamma) {
@@ -73,7 +70,6 @@ private:
 	}
 	static void convertOut(Float from, Float *to) { *to = from; }
 
-	// ImageTexture Private Data
 	unique_ptr<TextureMapping2D> mapping;
 	MIPMap<Tmemory> *mipmap;
 

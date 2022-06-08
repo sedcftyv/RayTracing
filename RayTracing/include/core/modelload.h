@@ -29,8 +29,7 @@ public:
 	void buildTextureModel(Transform& tri_Object2World, vector<shared_ptr<Primitive>>&prims);
 };
 
- inline shared_ptr<Material> getDiffuseMaterial(string filename)
-{
+inline shared_ptr<Material> getDiffuseMaterial(string filename){
 	unique_ptr<TextureMapping2D> map = make_unique<UVMapping2D>(1.f,1.f,0.f,0.f);
 	ImageWrap wrapMode = ImageWrap::Repeat;
 	bool trilerp = false;
@@ -39,22 +38,19 @@ public:
 	bool gamma = false;
 	shared_ptr<Texture<Spectrum>> Kt = make_shared<ImageTexture<RGBSpectrum, Spectrum>>(std::move(map), filename, trilerp, maxAniso, wrapMode, scale, gamma);
 	shared_ptr<Texture<Float>> sigmaRed = make_shared<ConstantTexture<Float>>(0.0f);
-	//shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
 	return make_shared<MatteMaterial>(Kt, sigmaRed);
 }
 
- inline shared_ptr<Material> getMetalRoughnessMaterial(string diffFilename,string specFilename)
- {
-	 unique_ptr<TextureMapping2D> map1 = make_unique<UVMapping2D>(1.f, 1.f, 0.f, 0.f);
-	 unique_ptr<TextureMapping2D> map2 = make_unique<UVMapping2D>(1.f, 1.f, 0.f, 0.f);
-	 ImageWrap wrapMode = ImageWrap::Repeat;
-	 bool trilerp = false;
-	 Float maxAniso = 8.f;
-	 Float scale = 1.f;
-	 bool gamma = false;
-	 shared_ptr<Texture<Spectrum>> base_color = make_shared<ImageTexture<Spectrum, Spectrum>>(std::move(map1), diffFilename, trilerp, maxAniso, wrapMode, scale, gamma);
-	 shared_ptr<Texture<Spectrum>> Roughness = make_shared<ImageTexture<Spectrum, Spectrum>>(std::move(map2), specFilename, trilerp, maxAniso, wrapMode, scale, gamma);
-	 //shared_ptr<Texture<Float>> bumpMap = make_shared<ConstantTexture<Float>>(0.0f);
+inline shared_ptr<Material> getMetalRoughnessMaterial(string diffFilename,string specFilename){
+	unique_ptr<TextureMapping2D> map1 = make_unique<UVMapping2D>(1.f, 1.f, 0.f, 0.f);
+	unique_ptr<TextureMapping2D> map2 = make_unique<UVMapping2D>(1.f, 1.f, 0.f, 0.f);
+	ImageWrap wrapMode = ImageWrap::Repeat;
+	bool trilerp = false;
+	Float maxAniso = 8.f;
+	Float scale = 1.f;
+	bool gamma = false;
+	shared_ptr<Texture<Spectrum>> base_color = make_shared<ImageTexture<Spectrum, Spectrum>>(std::move(map1), diffFilename, trilerp, maxAniso, wrapMode, scale, gamma);
+	shared_ptr<Texture<Spectrum>> Roughness = make_shared<ImageTexture<Spectrum, Spectrum>>(std::move(map2), specFilename, trilerp, maxAniso, wrapMode, scale, gamma);
 	 return make_shared<MetalRoughnessMaterial>(base_color, Roughness);
- }
+}
 #endif

@@ -24,20 +24,19 @@ using std::make_unique;
 using std::string;
 
 
-#define CHECK_NE(a)
-#define CHECK_EQ(a)
-#define CHECK_GE(a)
-#define CHECK_LT(a)
-#define DCHECK(a)
-#define DCHECK_NE(a)
-#define CHECK(a)
-#define CHECK_GT(a)
+//#define CHECK_NE(a)
+//#define CHECK_EQ(a)
+//#define CHECK_GE(a)
+//#define CHECK_LT(a)
+//#define DCHECK(a)
+//#define DCHECK_NE(a)
+//#define CHECK(a)
+//#define CHECK_GT(a)
 
 #ifndef PBRT_L1_CACHE_LINE_SIZE
 #define PBRT_L1_CACHE_LINE_SIZE 64
 #endif
 
-//#define PBRT_HAVE__ALIGNED_MALLOC
 
 
 #define PBRT_CONSTEXPR constexpr
@@ -45,7 +44,7 @@ using std::string;
 typedef double Float;
 #else
 typedef float Float;
-#endif // PBRT_FLOAT_AS_DOUBLE
+#endif 
 template <typename T>
 class Vector2;
 template <typename T>
@@ -72,8 +71,6 @@ class TransformedPrimitive;
 class MediumInterface;
 class BxDF;
 class BSDF;
-//class BSSRDF;
-//class MemoryArena;
 class RGBSpectrum;
 template <typename T>
 class Texture;
@@ -87,46 +84,23 @@ class Sampler;
 class TriangleMesh;
 class Distribution2D;
 class MicrofacetDistribution;
-inline void *AllocAligned(size_t size) {
-	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
-//#if defined(PBRT_HAVE__ALIGNED_MALLOC)
+//inline void *AllocAligned(size_t size) {
 //	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
-//#elif defined(PBRT_HAVE_POSIX_MEMALIGN)
-//	void *ptr;
-//	if (posix_memalign(&ptr, PBRT_L1_CACHE_LINE_SIZE, size) != 0) ptr = nullptr;
-//	return ptr;
-//#else
-//	return memalign(PBRT_L1_CACHE_LINE_SIZE, size);
-//#endif
-}
+//}
 
-//template <typename T>
-//T *AllocAligned(size_t count) {
-//	return (T *)AllocAligned(count * sizeof(T));
-//}
-//
-//inline void FreeAligned(void *ptr) {
-//	if (!ptr) return;
-//#if defined(PBRT_HAVE__ALIGNED_MALLOC)
-//	_aligned_free(ptr);
-//#else
-//	free(ptr);
-//#endif
-//}
 
 template <typename T, int logBlockSize=2>
 class BlockedArray {
 public:
-	// BlockedArray Public Methods
 	BlockedArray(int uRes, int vRes, const T *d = nullptr)
-		: uRes(uRes), vRes(vRes), uBlocks(RoundUp(uRes) >> logBlockSize) {
-		int nAlloc = RoundUp(uRes) * RoundUp(vRes);
-		//data = AllocAligned<T>(nAlloc);
-		data = new T[nAlloc];
-		for (int i = 0; i < nAlloc; ++i) new (&data[i]) T();
-		if (d)
-			for (int v = 0; v < vRes; ++v)
-				for (int u = 0; u < uRes; ++u) (*this)(u, v) = d[v * uRes + u];
+	: uRes(uRes), vRes(vRes), uBlocks(RoundUp(uRes) >> logBlockSize) {
+	int nAlloc = RoundUp(uRes) * RoundUp(vRes);
+	data = new T[nAlloc];
+	for (int i = 0; i < nAlloc; ++i) new (&data[i]) T();
+	if (d)
+		for (int v = 0; v < vRes; ++v)
+			for (int u = 0; u < uRes; ++u) 
+				(*this)(u, v) = d[v * uRes + u];
 	}
 	PBRT_CONSTEXPR int BlockSize() const { return 1 << logBlockSize; }
 	int RoundUp(int x) const {
@@ -137,7 +111,6 @@ public:
 	~BlockedArray() {
 		for (int i = 0; i < uRes * vRes; ++i) data[i].~T();
 		delete[]data;
-		//FreeAligned(data);
 	}
 	int Block(int a) const { return a >> logBlockSize; }
 	int Offset(int a) const { return (a & (BlockSize() - 1)); }
@@ -157,22 +130,20 @@ public:
 	}
 	void GetLinearArray(T *a) const {
 		for (int v = 0; v < vRes; ++v)
-			for (int u = 0; u < uRes; ++u) *a++ = (*this)(u, v);
+			for (int u = 0; u < uRes; ++u) 
+				*a++ = (*this)(u, v);
 	}
 
 private:
-	// BlockedArray Private Data
 	T *data;
 	const int uRes, vRes, uBlocks;
 };
 
 inline bool HasExtension(const std::string &value, const std::string &ending) {
 	if (ending.size() > value.size()) return false;
-	return std::equal(
-		ending.rbegin(), ending.rend(), value.rbegin(),
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin(),
 		[](char a, char b) { return std::tolower(a) == std::tolower(b); });
 }
-
 
 template <typename T, typename U, typename V>
 inline T Clamp(T val, U low, V high) {
@@ -201,7 +172,6 @@ const Float ShadowEpsilon = 0.0001f;
 const Float eps = 1e-4;
 static constexpr Float MachineEpsilon = std::numeric_limits<Float>::epsilon() * 0.5;
 static constexpr Float Infinity = std::numeric_limits<Float>::infinity();
-
 
 inline Float Radians(Float deg) {
 	return (Pi / 180) * deg;
@@ -245,14 +215,12 @@ template <typename Predicate> int FindInterval(int size,
 	int first = 0, len = size;
 	while (len > 0) {
 		int half = len >> 1, middle = first + half;
-		//<< Bisect range based on value of pred at middle >>
-			if (pred(middle)) {
-				first = middle + 1;
-				len -= half + 1;
-			}
-			else
-				len = half;
-
+		if (pred(middle)) {
+			first = middle + 1;
+			len -= half + 1;
+		}
+		else
+			len = half;
 	}
 	return Clamp(first - 1, 0, size - 2);
 }
@@ -273,7 +241,6 @@ inline Float InverseGammaCorrect(Float value) {
 
 inline Float Lerp(Float t, Float v1, Float v2) 
 { return (1 - t) * v1 + t * v2; }
-
 
 inline Float ErfInv(Float x) {
 	Float w, p;
@@ -307,7 +274,6 @@ inline Float ErfInv(Float x) {
 }
 
 inline Float Erf(Float x) {
-	// constants
 	Float a1 = 0.254829592f;
 	Float a2 = -0.284496736f;
 	Float a3 = 1.421413741f;
@@ -315,16 +281,12 @@ inline Float Erf(Float x) {
 	Float a5 = 1.061405429f;
 	Float p = 0.3275911f;
 
-	// Save the sign of x
 	int sign = 1;
 	if (x < 0) sign = -1;
 	x = std::abs(x);
 
-	// A&S formula 7.1.26
 	Float t = 1 / (1 + p * x);
-	Float y =
-		1 -
-		(((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * std::exp(-x * x);
+	Float y =1 -(((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * std::exp(-x * x);
 
 	return sign * y;
 }

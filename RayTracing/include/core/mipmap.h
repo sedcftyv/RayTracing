@@ -19,8 +19,7 @@ struct ResampleWeight {
 template <typename T>
 class MIPMap {
 public:
-	// MIPMap Public Methods
-	MIPMap(const Point2i &resolution, const T *data, bool doTri = false,
+		MIPMap(const Point2i &resolution, const T *data, bool doTri = false,
 		Float maxAniso = 8.f, ImageWrap wrapMode = ImageWrap::Repeat);
 	int Width() const { return resolution[0]; }
 	int Height() const { return resolution[1]; }
@@ -28,24 +27,19 @@ public:
 	const T &Texel(int level, int s, int t) const;
 	T Lookup(const Point2f &st, Float width = 0.f) const;
 	T Lookup(const Point2f &st, Vector2f dstdx, Vector2f dstdy) const;
-
 private:
-	// MIPMap Private Methods
-	std::unique_ptr<ResampleWeight[]> resampleWeights(int oldRes, int newRes) {
-		CHECK_GE(newRes, oldRes);
+		std::unique_ptr<ResampleWeight[]> resampleWeights(int oldRes, int newRes) {
 		std::unique_ptr<ResampleWeight[]> wt(new ResampleWeight[newRes]);
 		Float filterwidth = 2.f;
 		for (int i = 0; i < newRes; ++i) {
-			// Compute image resampling weights for _i_th texel
-			Float center = (i + .5f) * oldRes / newRes;
+						Float center = (i + .5f) * oldRes / newRes;
 			wt[i].firstTexel = std::floor((center - filterwidth) + 0.5f);
 			for (int j = 0; j < 4; ++j) {
 				Float pos = wt[i].firstTexel + j + .5f;
 				wt[i].weight[j] = Lanczos((pos - center) / filterwidth);
 			}
 
-			// Normalize filter weights for texel resampling
-			Float invSumWts = 1 / (wt[i].weight[0] + wt[i].weight[1] +
+						Float invSumWts = 1 / (wt[i].weight[0] + wt[i].weight[1] +
 				wt[i].weight[2] + wt[i].weight[3]);
 			for (int j = 0; j < 4; ++j) wt[i].weight[j] *= invSumWts;
 		}
@@ -53,14 +47,10 @@ private:
 	}
 	Float clamp(Float v) { return Clamp(v, 0.f, Infinity); }
 	RGBSpectrum clamp(const RGBSpectrum &v) { return v.Clamp(0.f, Infinity); }
-	//SampledSpectrum clamp(const SampledSpectrum &v) {
-	//	return v.Clamp(0.f, Infinity);
-	//}
-	T triangle(int level, const Point2f &st) const;
+				T triangle(int level, const Point2f &st) const;
 	T EWA(int level, Point2f st, Vector2f dst0, Vector2f dst1) const;
 
-	// MIPMap Private Data
-	const bool doTrilinear;
+		const bool doTrilinear;
 	const Float maxAnisotropy;
 	const ImageWrap wrapMode;
 	Point2i resolution;
@@ -76,24 +66,17 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 	maxAnisotropy(maxAnisotropy),
 	wrapMode(wrapMode),
 	resolution(res) {
-//	ProfilePhase _(Prof::MIPMapCreation);
 
 	std::unique_ptr<T[]> resampledImage = nullptr;
 	if (!IsPowerOf2(resolution[0]) || !IsPowerOf2(resolution[1])) {
-		// Resample image to power-of-two resolution
-		Point2i resPow2(RoundUpPow2(resolution[0]), RoundUpPow2(resolution[1]));
-		//LOG(INFO) << "Resampling MIPMap from " << resolution << " to " <<
-		//	resPow2 << ". Ratio= " << (Float(resPow2.x * resPow2.y) /
-		//		Float(resolution.x * resolution.y));
-		std::unique_ptr<ResampleWeight[]> sWeights =
+				Point2i resPow2(RoundUpPow2(resolution[0]), RoundUpPow2(resolution[1]));
+								std::unique_ptr<ResampleWeight[]> sWeights =
 			resampleWeights(resolution[0], resPow2[0]);
 		resampledImage.reset(new T[resPow2[0] * resPow2[1]]);
 
-		//ParallelFor([&](int t) {
-		for(int t=0;t< resolution[1];++t)
+				for(int t=0;t< resolution[1];++t)
 			for (int s = 0; s < resPow2[0]; ++s) {
-				// Compute texel (s,t) in s-zoomed image
-				resampledImage[t * resPow2[0] + s] = 0.f;
+								resampledImage[t * resPow2[0] + s] = 0.f;
 				for (int j = 0; j < 4; ++j) {
 					int origS = sWeights[s].firstTexel + j;
 					if (wrapMode == ImageWrap::Repeat)
@@ -106,21 +89,16 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 						img[t * resolution[0] + origS];
 				}
 			}
-	//	}
-	//, resolution[1], 16);
-		std::unique_ptr<ResampleWeight[]> tWeights =
+				std::unique_ptr<ResampleWeight[]> tWeights =
 			resampleWeights(resolution[1], resPow2[1]);
 		std::vector<T *> resampleBufs;
-		int nThreads = 1;//MaxThreadIndex();
-		for (int i = 0; i < nThreads; ++i)
+		int nThreads = 1;		for (int i = 0; i < nThreads; ++i)
 			resampleBufs.push_back(new T[resPow2[1]]);
 		
 		T *workData = new T[resPow2[1]];
-		//ParallelFor([&](int s) {
-		for (int s = 0; s < resPow2[0]; ++s)
+				for (int s = 0; s < resPow2[0]; ++s)
 		{
-			//T *workData = resampleBufs[0];
-			for (int t = 0; t < resPow2[1]; ++t) {
+						for (int t = 0; t < resPow2[1]; ++t) {
 				workData[t] = 0.f;
 				for (int j = 0; j < 4; ++j) {
 					int offset = tWeights[t].firstTexel + j;
@@ -136,18 +114,15 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 			for (int t = 0; t < resPow2[1]; ++t)
 				resampledImage[t * resPow2[0] + s] = clamp(workData[t]);
 		}
-		//}, resPow2[0], 32);
-		delete[] workData;
+				delete[] workData;
 
 		for (auto ptr : resampleBufs) delete[] ptr;
 		resolution = resPow2;
 	}
-	// Initialize levels of MIPMap from image
-	int nLevels = 1 + Log2Int(std::max(resolution[0], resolution[1]));
+		int nLevels = 1 + Log2Int(std::max(resolution[0], resolution[1]));
 	pyramid.resize(nLevels);
 
-	// Initialize most detailed level of MIPMap
-	pyramid[0].reset(
+		pyramid[0].reset(
 		new BlockedArray<T>(resolution[0], resolution[1],
 			resampledImage ? resampledImage.get() : img));
 	for (int i = 1; i < nLevels; ++i) {
@@ -155,18 +130,15 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 		int tRes = std::max(1, pyramid[i - 1]->vSize() / 2);
 		pyramid[i].reset(new BlockedArray<T>(sRes, tRes));
 
-		//ParallelFor([&](int t) {
-		for(int t=0;t<tRes;++t)
+				for(int t=0;t<tRes;++t)
 			for (int s = 0; s < sRes; ++s)
 				(*pyramid[i])(s, t) =
 				.25f * (Texel(i - 1, 2 * s, 2 * t) +
 					Texel(i - 1, 2 * s + 1, 2 * t) +
 					Texel(i - 1, 2 * s, 2 * t + 1) +
 					Texel(i - 1, 2 * s + 1, 2 * t + 1));
-		//}, tRes, 16);
-	}
-		// Initialize EWA filter weights if needed
-		if (weightLut[0] == 0.) {
+			}
+				if (weightLut[0] == 0.) {
 			for (int i = 0; i < WeightLUTSize; ++i) {
 				Float alpha = 2;
 				Float r2 = Float(i) / Float(WeightLUTSize - 1);
@@ -178,10 +150,8 @@ MIPMap<T>::MIPMap(const Point2i &res, const T *img, bool doTrilinear,
 
 template <typename T>
 const T &MIPMap<T>::Texel(int level, int s, int t) const {
-	CHECK_LT(level, pyramid.size());
 	const BlockedArray<T> &l = *pyramid[level];
-	// Compute texel (s,t) accounting for boundary conditions
-	switch (wrapMode) {
+		switch (wrapMode) {
 	case ImageWrap::Repeat:
 		s = Mod(s, l.uSize());
 		t = Mod(t, l.vSize());
@@ -203,12 +173,9 @@ const T &MIPMap<T>::Texel(int level, int s, int t) const {
 template <typename T>
 T MIPMap<T>::Lookup(const Point2f &st, Float width) const {
 	++nTrilerpLookups;
-//	ProfilePhase p(Prof::TexFiltTrilerp);
-	// Compute MIPMap level for trilinear filtering
-	Float level = Levels() - 1 + Log2(std::max(width, (Float)1e-8));
+		Float level = Levels() - 1 + Log2(std::max(width, (Float)1e-8));
 
-	// Perform trilinear interpolation at appropriate MIPMap level
-	if (level < 0)
+		if (level < 0)
 		return triangle(0, st);
 	else if (level >= Levels() - 1)
 		return Texel(Levels() - 1, 0, 0);
@@ -240,22 +207,18 @@ T MIPMap<T>::Lookup(const Point2f &st, Vector2f dst0, Vector2f dst1) const {
 		return Lookup(st, width);
 	}
 	++nEWALookups;
-	//ProfilePhase p(Prof::TexFiltEWA);
-	// Compute ellipse minor and major axes
-	if (dst0.LengthSquared() < dst1.LengthSquared()) std::swap(dst0, dst1);
+			if (dst0.LengthSquared() < dst1.LengthSquared()) std::swap(dst0, dst1);
 	Float majorLength = dst0.Length();
 	Float minorLength = dst1.Length();
 
-	// Clamp ellipse eccentricity if too large
-	if (minorLength * maxAnisotropy < majorLength && minorLength > 0) {
+		if (minorLength * maxAnisotropy < majorLength && minorLength > 0) {
 		Float scale = majorLength / (minorLength * maxAnisotropy);
 		dst1 *= scale;
 		minorLength *= scale;
 	}
 	if (minorLength == 0) return triangle(0, st);
 
-	// Choose level of detail for EWA lookup and perform EWA filtering
-	Float lod = std::max((Float)0, Levels() - (Float)1 + Log2(minorLength));
+		Float lod = std::max((Float)0, Levels() - (Float)1 + Log2(minorLength));
 	int ilod = std::floor(lod);
 	return Lerp(lod - ilod, EWA(ilod, st, dst0, dst1),
 		EWA(ilod + 1, st, dst0, dst1));
@@ -264,16 +227,14 @@ T MIPMap<T>::Lookup(const Point2f &st, Vector2f dst0, Vector2f dst1) const {
 template <typename T>
 T MIPMap<T>::EWA(int level, Point2f st, Vector2f dst0, Vector2f dst1) const {
 	if (level >= Levels()) return Texel(Levels() - 1, 0, 0);
-	// Convert EWA coordinates to appropriate scale for level
-	st[0] = st[0] * pyramid[level]->uSize() - 0.5f;
+		st[0] = st[0] * pyramid[level]->uSize() - 0.5f;
 	st[1] = st[1] * pyramid[level]->vSize() - 0.5f;
 	dst0[0] *= pyramid[level]->uSize();
 	dst0[1] *= pyramid[level]->vSize();
 	dst1[0] *= pyramid[level]->uSize();
 	dst1[1] *= pyramid[level]->vSize();
 
-	// Compute ellipse coefficients to bound EWA filter region
-	Float A = dst0[1] * dst0[1] + dst1[1] * dst1[1] + 1;
+		Float A = dst0[1] * dst0[1] + dst1[1] * dst1[1] + 1;
 	Float B = -2 * (dst0[0] * dst0[1] + dst1[0] * dst1[1]);
 	Float C = dst0[0] * dst0[0] + dst1[0] * dst1[0] + 1;
 	Float invF = 1 / (A * C - B * B * 0.25f);
@@ -281,8 +242,7 @@ T MIPMap<T>::EWA(int level, Point2f st, Vector2f dst0, Vector2f dst1) const {
 	B *= invF;
 	C *= invF;
 
-	// Compute the ellipse's (s,t) bounding box in texture space
-	Float det = -B * B + 4 * A * C;
+		Float det = -B * B + 4 * A * C;
 	Float invDet = 1 / det;
 	Float uSqrt = std::sqrt(det * C), vSqrt = std::sqrt(A * det);
 	int s0 = std::ceil(st[0] - 2 * invDet * uSqrt);
@@ -290,15 +250,13 @@ T MIPMap<T>::EWA(int level, Point2f st, Vector2f dst0, Vector2f dst1) const {
 	int t0 = std::ceil(st[1] - 2 * invDet * vSqrt);
 	int t1 = std::floor(st[1] + 2 * invDet * vSqrt);
 
-	// Scan over ellipse bound and compute quadratic equation
-	T sum(0.f);
+		T sum(0.f);
 	Float sumWts = 0;
 	for (int it = t0; it <= t1; ++it) {
 		Float tt = it - st[1];
 		for (int is = s0; is <= s1; ++is) {
 			Float ss = is - st[0];
-			// Compute squared radius and filter texel if inside ellipse
-			Float r2 = A * ss * ss + B * ss * tt + C * tt * tt;
+						Float r2 = A * ss * ss + B * ss * tt + C * tt * tt;
 			if (r2 < 1) {
 				int index =
 					std::min((int)(r2 * WeightLUTSize), WeightLUTSize - 1);

@@ -41,7 +41,5 @@ static RGBSpectrum *ReadImagePNG(const std::string &name, int *width,
 	}
 
 	free(rgb);
-	//LOG(INFO) << StringPrintf("Read PNG image %s (%d x %d)",
-	//	name.c_str(), *width, *height);
 	return ret;
 }

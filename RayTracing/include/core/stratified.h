@@ -8,9 +8,7 @@
 
 class StratifiedSampler : public PixelSampler {
 public:
-	// StratifiedSampler Public Methods
-	StratifiedSampler(int xPixelSamples, int yPixelSamples, bool jitterSamples,
-		int nSampledDimensions)
+	StratifiedSampler(int xPixelSamples, int yPixelSamples, bool jitterSamples,int nSampledDimensions)
 		: PixelSampler(xPixelSamples * yPixelSamples, nSampledDimensions),
 		xPixelSamples(xPixelSamples),
 		yPixelSamples(yPixelSamples),
@@ -19,7 +17,6 @@ public:
 	std::unique_ptr<Sampler> Clone(int seed);
 
 private:
-	// StratifiedSampler Private Data
 	const int xPixelSamples, yPixelSamples;
 	const bool jitterSamples;
 };

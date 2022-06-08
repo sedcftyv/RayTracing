@@ -5,15 +5,13 @@
 
 #include "pbrt.h"
 #include "geometry.h"
-//#include "interaction.h"
 
 struct Matrix4x4 {
-	//<< Matrix4x4 Public Methods >>
-	Matrix4x4() {
+		Matrix4x4() {
 		m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.f;
 		m[0][1] = m[0][2] = m[0][3] = m[1][0] =
-			m[1][2] = m[1][3] = m[2][0] = m[2][1] = m[2][3] =
-			m[3][0] = m[3][1] = m[3][2] = 0.f;
+		m[1][2] = m[1][3] = m[2][0] = m[2][1] = m[2][3] =
+		m[3][0] = m[3][1] = m[3][2] = 0.f;
 	}
 	Matrix4x4(Float mat[4][4]);
 	Matrix4x4(Float t00, Float t01, Float t02, Float t03,
@@ -62,7 +60,6 @@ struct Matrix4x4 {
 
 class Transform {
 public:
-	//<< Transform Public Methods >>
 	Transform() { }
 	Transform(const Float mat[4][4]) {
 		m = Matrix4x4(mat[0][0], mat[0][1], mat[0][2], mat[0][3],
@@ -119,48 +116,21 @@ public:
 	template <typename T> inline Point3<T> operator()(const Point3<T> &p) const;
 	template <typename T> inline Vector3<T> operator()(const Vector3<T> &v) const;
 	template <typename T> inline Normal3<T> operator()(const Normal3<T> &) const;
-	//template <typename T> inline void operator()(const Normal3<T> &, Normal3<T> *nt) const;
 	inline Ray operator()(const Ray &r) const;
-	//inline RayDifferential operator()(const RayDifferential &r) const;
 	Bounds3f operator()(const Bounds3f &b) const;
 	Transform operator*(const Transform &t2) const;
 	bool SwapsHandedness() const;
-	SurfaceInteraction operator()(const SurfaceInteraction &si) const;
-	//template <typename T> inline Point3<T> operator()(const Point3<T> &pt, Vector3<T> *absError) const;
-	//template <typename T> inline Point3<T> operator()(const Point3<T> &p, const Vector3<T> &pError,Vector3<T> *pTransError) const;
-	//template <typename T> inline Vector3<T>
-	//	operator()(const Vector3<T> &v, Vector3<T> *vTransError) const;
-	//template <typename T> inline Vector3<T>
-	//	operator()(const Vector3<T> &v, const Vector3<T> &vError,
-	//		Vector3<T> *vTransError) const;
-	//inline Ray operator()(const Ray &r, Vector3f *oError,
-	//	Vector3f *dError) const;
-	//inline Ray operator()(const Ray &r, const Vector3f &oErrorIn,
-	//	const Vector3f &dErrorIn, Vector3f *oErrorOut,
-	//	Vector3f *dErrorOut) const;
-
+	SurfaceInteraction operator()(const SurfaceInteraction &si) const;										
 private:
-	//<< Transform Private Data >>
 	Matrix4x4 m, mInv;
-	//friend class AnimatedTransform;
-	//friend struct Quaternion;
 };
 
 inline Ray Transform::operator()(const Ray &r) const {
-	//Vector3f oError;
 	Point3f o = Point3f((*this)(r.o));
 	Vector3f d = (*this)(r.d);
-	// Offset ray origin to edge of error bounds and compute _tMax_
-	//	Float lengthSquared = d.LengthSquared();
 	Float tMax = r.tMax;
-	//if (lengthSquared > 0) {
-	//	Float dt = Dot(Abs(d), oError) / lengthSquared;
-	//	o += d * dt;
-	//	tMax -= dt;
-	//}
 	return Ray(o, d, tMax, r.time);
 }
-
 
 template <typename T> inline Point3<T>
 	Transform::operator()(const Point3<T> &p) const {
@@ -169,8 +139,10 @@ template <typename T> inline Point3<T>
 		T yp = m.m[1][0] * x + m.m[1][1] * y + m.m[1][2] * z + m.m[1][3];
 		T zp = m.m[2][0] * x + m.m[2][1] * y + m.m[2][2] * z + m.m[2][3];
 		T wp = m.m[3][0] * x + m.m[3][1] * y + m.m[3][2] * z + m.m[3][3];
-		if (wp == 1) return Point3<T>(xp, yp, zp);
-		else         return Point3<T>(xp, yp, zp) / wp;
+		if (wp == 1) 
+			return Point3<T>(xp, yp, zp);
+		else         
+			return Point3<T>(xp, yp, zp) / wp;
 	}
 template <typename T> inline Vector3<T>
 	Transform::operator()(const Vector3<T> &v) const {

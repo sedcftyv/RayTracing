@@ -37,9 +37,7 @@ int main()
 					now_count++,cv.wait(loc);
 			}
 			cout << now_count << endl;
-				//while (1)
-				//	cout << out << endl;
-		},i));
+										},i));
 	}
 	{
 		std::unique_lock<mutex> loc(mt);
@@ -52,14 +50,6 @@ int main()
 	cout << now_count << endl;
 	for (int i = 0; i < pool.size(); ++i)
 		pool[i].join();
-	//while (1)
-	//	cout << 8 << endl;
-	//test now;
-	//now.fun();
-	//std::thread t(func);
-	//cv.notify_all();
-	////std::thread t(&test::func,&now);
-	//t.join();
-    std::cout << "Hello World!\n"<<endl;
+								    std::cout << "Hello World!\n"<<endl;
 }
 

@@ -14,11 +14,9 @@ using std::istringstream;
 inline bool objload(std::string path, std::vector<Point3f>&p,std::vector<int>&vi)
 {
 	ifstream fin(path);
-	//ifstream fin("ratings1m.data");
 	string in;
 	while (getline(fin, in))
 	{
-		//std::cout << in << std::endl;
 		istringstream line(in);
 		char id;
 		line >> id;

@@ -14,32 +14,13 @@ inline bool isNaN(const int x) {
 	return false;
 }
 
-//class Medium;
-template <typename T>
-class Vector2 {
+template <typename T> class Vector2 {
 public:
-	// Vector2 Public Methods
 	Vector2() { x = y = 0; }
-	Vector2(T xx, T yy) : x(xx), y(yy) { DCHECK(!HasNaNs()); }
+	Vector2(T xx, T yy) : x(xx), y(yy) {}
 	bool HasNaNs() const { return isNaN(x) || isNaN(y); }
 	explicit Vector2(const Point2<T> &p);
 	explicit Vector2(const Point3<T> &p);
-#ifndef NDEBUG
-	// The default versions of these are fine for release builds; for debug
-	// we define them so that we can add the Assert checks.
-	Vector2(const Vector2<T> &v) {
-		DCHECK(!v.HasNaNs());
-		x = v.x;
-		y = v.y;
-	}
-	Vector2<T> &operator=(const Vector2<T> &v) {
-		DCHECK(!v.HasNaNs());
-		x = v.x;
-		y = v.y;
-		return *this;
-	}
-#endif  // !NDEBUG
-
 	Vector2<T> operator+(const Vector2<T> &v) const {
 		DCHECK(!v.HasNaNs());
 		return Vector2(x + v.x, y + v.y);
@@ -71,21 +52,18 @@ public:
 
 	template <typename U>
 	Vector2<T> &operator*=(U f) {
-		DCHECK(!isNaN(f));
 		x *= f;
 		y *= f;
 		return *this;
 	}
 	template <typename U>
 	Vector2<T> operator/(U f) const {
-		CHECK_NE(f, 0);
 		Float inv = (Float)1 / f;
 		return Vector2<T>(x * inv, y * inv);
 	}
 
 	template <typename U>
 	Vector2<T> &operator/=(U f) {
-		CHECK_NE(f, 0);
 		Float inv = (Float)1 / f;
 		x *= inv;
 		y *= inv;
@@ -93,20 +71,17 @@ public:
 	}
 	Vector2<T> operator-() const { return Vector2<T>(-x, -y); }
 	T operator[](int i) const {
-		DCHECK(i >= 0 && i <= 1);
 		if (i == 0) return x;
 		return y;
 	}
 
 	T &operator[](int i) {
-		DCHECK(i >= 0 && i <= 1);
 		if (i == 0) return x;
 		return y;
 	}
 	Float LengthSquared() const { return x * x + y * y; }
 	Float Length() const { return std::sqrt(LengthSquared()); }
 
-	// Vector2 Public Data
 	T x, y;
 };
 
@@ -139,20 +114,6 @@ public:
 		return std::isnan(x) || std::isnan(y) || std::isnan(z);
 	}
 	explicit Vector3(const Point3<T> &p);
-#ifndef NDEBUG
-	// The default versions of these are fine for release builds; for debug
-	// we define them so that we can add the assert checks.
-	Vector3(const Vector3<T> &v) {
-		assert(!v.HasNaNs());
-		x = v.x; y = v.y; z = v.z;
-	}
-
-	Vector3<T> &operator=(const Vector3<T> &v) {
-		assert(!v.HasNaNs());
-		x = v.x; y = v.y; z = v.z;
-		return *this;
-	}
-#endif // !NDEBUG
 	friend std::ostream& operator<<(std::ostream& os, const Vector3<T> &v) {
 		os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
 		return os;
@@ -281,12 +242,10 @@ inline Vector3<T> Faceforward(const Vector3<T> &v, const Vector3<T> &v2) {
 template <typename T>
 inline Vector3<T>::Vector3(const Point3<T> &p)
 	: x(p.x), y(p.y), z(p.z) {
-	DCHECK(!HasNaNs());
 }
 
 typedef Vector3<Float> Vector3f;
-using color = Vector3f;    // RGB color
-typedef Vector3<int>   Vector3i;
+using color = Vector3f;    typedef Vector3<int>   Vector3i;
 typedef Vector2<Float> Vector2f;
 typedef Vector2<int>   Vector2i;
 
@@ -304,18 +263,6 @@ public:
 		return Vector3<U>(x, y, z);
 	}
 	explicit Point3(const Vector3<T> &p);
-#ifndef NDEBUG
-	Point3(const Point3<T> &p) {
-		assert(!p.HasNaNs());
-		x = p.x; y = p.y; z = p.z;
-	}
-
-	Point3<T> &operator=(const Point3<T> &p) {
-		assert(!p.HasNaNs());
-		x = p.x; y = p.y; z = p.z;
-		return *this;
-	}
-#endif // !NDEBUG
 	friend std::ostream& operator<<(std::ostream& os, const Point3<T> &p) {
 		os << "[" << p.x << ", " << p.y << ", " << p.z << "]";
 		return os;
@@ -390,13 +337,11 @@ public:
 template <typename T>
 inline Point3<T>::Point3(const Vector3<T> &p)
 	: x(p.x), y(p.y), z(p.z) {
-	DCHECK(!HasNaNs());
 }
 
 
 template <typename T, typename U>
 inline Point3<T> operator*(U f, const Point3<T> &p) {
-	DCHECK(!p.HasNaNs());
 	return p * f;
 }
 template <typename T> inline Float Distance(const Point3<T> &p1, const Point3<T> &p2) {
@@ -432,7 +377,6 @@ template <typename T> Point3<T> Permute(const Point3<T> &p, int x, int y, int z)
 template <typename T>
 class Point2 {
 public:
-	// Point2 Public Methods
 	explicit Point2(const Point3<T> &p) : x(p.x), y(p.y) { assert(!HasNaNs()); }
 	Point2() { x = y = 0; }
 	Point2(T xx, T yy) : x(xx), y(yy) { assert(!HasNaNs()); }
@@ -456,20 +400,6 @@ public:
 		return Vector2<U>(x, y);
 	}
 
-#ifndef NDEBUG
-	Point2(const Point2<T> &p) {
-		assert(!p.HasNaNs());
-		x = p.x;
-		y = p.y;
-	}
-
-	Point2<T> &operator=(const Point2<T> &p) {
-		assert(!p.HasNaNs());
-		x = p.x;
-		y = p.y;
-		return *this;
-	}
-#endif  // !NDEBUG
 	Point2<T> operator+(const Vector2<T> &v) const {
 		assert(!v.HasNaNs());
 		return Point2<T>(x + v.x, y + v.y);
@@ -544,16 +474,13 @@ public:
 	bool operator!=(const Point2<T> &p) const { return x != p.x || y != p.y; }
 	bool HasNaNs() const { return isNaN(x) || isNaN(y); }
 
-	// Point2 Public Data
-	T x, y;
+		T x, y;
 };
 
 template <typename T, typename U>
 inline Point2<T> operator*(U f, const Point2<T> &p) {
-	DCHECK(!p.HasNaNs());
 	return p * f;
 }
-
 
 typedef Point2<Float> Point2f;
 typedef Point2<int>   Point2i;
@@ -562,7 +489,7 @@ typedef Point3<int>   Point3i;
 
 template <typename T> class Normal3 {
 public:
-		Normal3() { x = y = z = 0; }
+	Normal3() { x = y = z = 0; }
 	Normal3(T xx, T yy, T zz)
 		: x(xx), y(yy), z(zz) {
 	}
@@ -609,49 +536,36 @@ public:
 		return *this;
 	}
 	Float LengthSquared() const { return x * x + y * y + z * z; }
-	Float Length() const { return std::sqrt(LengthSquared()); }
+	Float Length() const { return std::sqrt(LengthSquared()); }	
+	friend std::ostream& operator<<(std::ostream& os, const Normal3<T> &v) {
+		os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
+		return os;
+	}
+	explicit Normal3<T>(const Vector3<T> &v) : x(v.x), y(v.y), z(v.z) {
+		assert(!v.HasNaNs());
+	}
+	bool operator==(const Normal3<T> &n) const {
+		return x == n.x && y == n.y && z == n.z;
+	}
+	bool operator!=(const Normal3<T> &n) const {
+		return x != n.x || y != n.y || z != n.z;
+	}
 
-#ifndef NDEBUG
-		Normal3<T>(const Normal3<T> &n) {
-			assert(!n.HasNaNs());
-			x = n.x; y = n.y; z = n.z;
-		}
+	T operator[](int i) const {
+		assert(i >= 0 && i <= 2);
+		if (i == 0) return x;
+		if (i == 1) return y;
+		return z;
+	}
 
-		Normal3<T> &operator=(const Normal3<T> &n) {
-			assert(!n.HasNaNs());
-			x = n.x; y = n.y; z = n.z;
-			return *this;
-		}
-#endif // !NDEBUG
-		friend std::ostream& operator<<(std::ostream& os, const Normal3<T> &v) {
-			os << "[" << v.x << ", " << v.y << ", " << v.z << "]";
-			return os;
-		}
-		explicit Normal3<T>(const Vector3<T> &v) : x(v.x), y(v.y), z(v.z) {
-			assert(!v.HasNaNs());
-		}
-		bool operator==(const Normal3<T> &n) const {
-			return x == n.x && y == n.y && z == n.z;
-		}
-		bool operator!=(const Normal3<T> &n) const {
-			return x != n.x || y != n.y || z != n.z;
-		}
+	T &operator[](int i) {
+		assert(i >= 0 && i <= 2);
+		if (i == 0) return x;
+		if (i == 1) return y;
+		return z;
+	}
 
-		T operator[](int i) const {
-			assert(i >= 0 && i <= 2);
-			if (i == 0) return x;
-			if (i == 1) return y;
-			return z;
-		}
-
-		T &operator[](int i) {
-			assert(i >= 0 && i <= 2);
-			if (i == 0) return x;
-			if (i == 1) return y;
-			return z;
-		}
-
-		T x, y, z;
+	T x, y, z;
 
 };
 
@@ -670,7 +584,6 @@ Vector3<T>::Vector3(const Normal3<T> &n) : x(n.x), y(n.y), z(n.z) {
 	assert(!n.HasNaNs());
 }
 
-
 template <typename T> inline Normal3<T>
 	Faceforward(const Normal3<T> &n, const Vector3<T> &v) {
 		return (Dot(n, v) < 0.f) ? -n : n;
@@ -679,7 +592,6 @@ template <typename T> inline Normal3<T>
 
 template <typename T>
 inline Vector3<T> Cross(const Vector3<T> &v1, const Normal3<T> &v2) {
-	DCHECK(!v1.HasNaNs() && !v2.HasNaNs());
 	double v1x = v1.x, v1y = v1.y, v1z = v1.z;
 	double v2x = v2.x, v2y = v2.y, v2z = v2.z;
 	return Vector3<T>((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z),
@@ -688,7 +600,6 @@ inline Vector3<T> Cross(const Vector3<T> &v1, const Normal3<T> &v2) {
 
 template <typename T>
 inline Vector3<T> Cross(const Normal3<T> &v1, const Vector3<T> &v2) {
-	DCHECK(!v1.HasNaNs() && !v2.HasNaNs());
 	double v1x = v1.x, v1y = v1.y, v1z = v1.z;
 	double v2x = v2.x, v2y = v2.y, v2z = v2.z;
 	return Vector3<T>((v1y * v2z) - (v1z * v2y), (v1z * v2x) - (v1x * v2z),
@@ -697,13 +608,11 @@ inline Vector3<T> Cross(const Normal3<T> &v1, const Vector3<T> &v2) {
 
 template <typename T>
 inline T AbsDot(const Normal3<T> &n1, const Vector3<T> &v2) {
-	DCHECK(!n1.HasNaNs() && !v2.HasNaNs());
 	return std::abs(n1.x * v2.x + n1.y * v2.y + n1.z * v2.z);
 }
 
 template <typename T>
 inline T AbsDot(const Vector3<T> &v1, const Normal3<T> &n2) {
-	DCHECK(!v1.HasNaNs() && !n2.HasNaNs());
 	return std::abs(v1.x * n2.x + v1.y * n2.y + v1.z * n2.z);
 }
 
@@ -733,8 +642,7 @@ public:
 	Vector3f d;
 	mutable Float tMax;
 	Float time;
-	//const Medium *medium;
-
+	
 };
 
 template <typename T>
@@ -768,7 +676,6 @@ inline Normal3<T> Faceforward(const Normal3<T> &n, const Normal3<T> &n2) {
 template <typename T>
 class Bounds2 {
 public:
-	// Bounds2 Public Methods
 	Bounds2() {
 		T minNum = std::numeric_limits<T>::lowest();
 		T maxNum = std::numeric_limits<T>::max();
@@ -798,11 +705,9 @@ public:
 			return 1;
 	}
 	inline const Point2<T> &operator[](int i) const {
-		DCHECK(i == 0 || i == 1);
 		return (i == 0) ? pMin : pMax;
 	}
 	inline Point2<T> &operator[](int i) {
-		DCHECK(i == 0 || i == 1);
 		return (i == 0) ? pMin : pMax;
 	}
 	bool operator==(const Bounds2<T> &b) const {
@@ -830,13 +735,11 @@ public:
 		return os;
 	}
 
-	// Bounds2 Public Data
 	Point2<T> pMin, pMax;
 };
 
 template <typename T> class Bounds3 {
 public:
-	//<< Bounds3 Public Methods >>
 	Bounds3() {
 		T minNum = std::numeric_limits<T>::lowest();
 		T maxNum = std::numeric_limits<T>::max();
@@ -905,30 +808,26 @@ public:
 	bool IntersectP(const Ray &ray, Float *hitt0 = nullptr, Float *hitt1 = nullptr) const;
 	inline bool IntersectP(const Ray &ray, const Vector3f &invDir,const int dirIsNeg[3]) const;
 
-	//<< Bounds3 Public Data >>
 	Point3<T> pMin, pMax;
-
 };
 
 template <typename T>
 inline const Point3<T> &Bounds3<T>::operator[](int i) const {
-	DCHECK(i == 0 || i == 1);
 	return (i == 0) ? pMin : pMax;
 }
 
 template <typename T>
 inline Point3<T> &Bounds3<T>::operator[](int i) {
-	DCHECK(i == 0 || i == 1);
 	return (i == 0) ? pMin : pMax;
 }
 
 template <typename T> Bounds3 <T> Union(const Bounds3<T> &b, const Point3<T> &p) {
-		return Bounds3<T>(Point3<T>(std::min(b.pMin.x, p.x),
-			std::min(b.pMin.y, p.y),
-			std::min(b.pMin.z, p.z)),
-			Point3<T>(std::max(b.pMax.x, p.x),
-				std::max(b.pMax.y, p.y),
-				std::max(b.pMax.z, p.z)));
+	return Bounds3<T>(Point3<T>(std::min(b.pMin.x, p.x),
+								std::min(b.pMin.y, p.y),
+								std::min(b.pMin.z, p.z)),
+					  Point3<T>(std::max(b.pMax.x, p.x),
+								std::max(b.pMax.y, p.y),
+								std::max(b.pMax.z, p.z)));
 	}
 
 template <typename T> Bounds3<T> Union(const Bounds3<T> &b1, const Bounds3<T> &b2) {
@@ -941,33 +840,33 @@ template <typename T> Bounds3<T> Union(const Bounds3<T> &b1, const Bounds3<T> &b
 }
 
 template <typename T> Bounds3<T> Intersect(const Bounds3<T> &b1, const Bounds3<T> &b2) {
-		return Bounds3<T>(Point3<T>(std::max(b1.pMin.x, b2.pMin.x),
-			std::max(b1.pMin.y, b2.pMin.y),
-			std::max(b1.pMin.z, b2.pMin.z)),
-			Point3<T>(std::min(b1.pMax.x, b2.pMax.x),
-				std::min(b1.pMax.y, b2.pMax.y),
-				std::min(b1.pMax.z, b2.pMax.z)));
-	}
+	return Bounds3<T>(Point3<T>(std::max(b1.pMin.x, b2.pMin.x),
+								std::max(b1.pMin.y, b2.pMin.y),
+								std::max(b1.pMin.z, b2.pMin.z)),
+						Point3<T>(std::min(b1.pMax.x, b2.pMax.x),
+								std::min(b1.pMax.y, b2.pMax.y),
+								std::min(b1.pMax.z, b2.pMax.z)));
+}
 template <typename T> bool Overlaps(const Bounds3<T> &b1, const Bounds3<T> &b2) {
-		bool x = (b1.pMax.x >= b2.pMin.x) && (b1.pMin.x <= b2.pMax.x);
-		bool y = (b1.pMax.y >= b2.pMin.y) && (b1.pMin.y <= b2.pMax.y);
-		bool z = (b1.pMax.z >= b2.pMin.z) && (b1.pMin.z <= b2.pMax.z);
-		return (x && y && z);
-	}
+	bool x = (b1.pMax.x >= b2.pMin.x) && (b1.pMin.x <= b2.pMax.x);
+	bool y = (b1.pMax.y >= b2.pMin.y) && (b1.pMin.y <= b2.pMax.y);
+	bool z = (b1.pMax.z >= b2.pMin.z) && (b1.pMin.z <= b2.pMax.z);
+	return (x && y && z);
+}
 template <typename T> bool Inside(const Point3<T> &p, const Bounds3<T> &b) {
 	return (p.x >= b.pMin.x && p.x <= b.pMax.x &&
-		p.y >= b.pMin.y && p.y <= b.pMax.y &&
-		p.z >= b.pMin.z && p.z <= b.pMax.z);
+			p.y >= b.pMin.y && p.y <= b.pMax.y &&
+			p.z >= b.pMin.z && p.z <= b.pMax.z);
 }
 template <typename T> bool InsideExclusive(const Point3<T> &p, const Bounds3<T> &b) {
 	return (p.x >= b.pMin.x && p.x < b.pMax.x &&
-		p.y >= b.pMin.y && p.y < b.pMax.y &&
-		p.z >= b.pMin.z && p.z < b.pMax.z);
+			p.y >= b.pMin.y && p.y < b.pMax.y &&
+			p.z >= b.pMin.z && p.z < b.pMax.z);
 }
 template <typename T, typename U> inline Bounds3<T> Expand(const Bounds3<T> &b, U delta) {
-		return Bounds3<T>(b.pMin - Vector3<T>(delta, delta, delta),
-			b.pMax + Vector3<T>(delta, delta, delta));
-	}
+	return Bounds3<T>(b.pMin - Vector3<T>(delta, delta, delta),
+		b.pMax + Vector3<T>(delta, delta, delta));
+}
 
 typedef Bounds2<Float> Bounds2f;
 typedef Bounds2<int>   Bounds2i;
@@ -979,15 +878,10 @@ inline bool Bounds3<T>::IntersectP(const Ray &ray, Float *hitt0,
 	Float *hitt1) const {
 	Float t0 = 0, t1 = ray.tMax;
 	for (int i = 0; i < 3; ++i) {
-		// Update interval for _i_th bounding box slab
 		Float invRayDir = 1 / ray.d[i];
 		Float tNear = (pMin[i] - ray.o[i]) * invRayDir;
 		Float tFar = (pMax[i] - ray.o[i]) * invRayDir;
-
-		// Update parametric interval from slab intersection t values
 		if (tNear > tFar) std::swap(tNear, tFar);
-
-		// Update _tFar_ to ensure robust ray--bounds intersection
 		tFar *= 1 + 2 * gamma(3);
 		t0 = tNear > t0 ? tNear : t0;
 		t1 = tFar < t1 ? tFar : t1;
@@ -1001,24 +895,17 @@ inline bool Bounds3<T>::IntersectP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectP(const Ray &ray, const Vector3f &invDir,const int dirIsNeg[3]) const {
 	const Bounds3f &bounds = *this;
-	// Check for ray intersection against x and y slabs
 	Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
 	Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
 	Float tyMin = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
 	Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
-
-	// Update _tMax_ and _tyMax_ to ensure robust bounds intersection
 	tMax *= 1 + 2 * gamma(3);
 	tyMax *= 1 + 2 * gamma(3);
 	if (tMin > tyMax || tyMin > tMax) return false;
 	if (tyMin > tMin) tMin = tyMin;
 	if (tyMax < tMax) tMax = tyMax;
-
-	// Check for ray intersection against z slab
 	Float tzMin = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
 	Float tzMax = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
-
-	// Update _tzMax_ to ensure robust bounds intersection
 	tzMax *= 1 + 2 * gamma(3);
 	if (tMin > tzMax || tzMin > tMax) return false;
 	if (tzMin > tMin) tMin = tzMin;
@@ -1026,28 +913,23 @@ inline bool Bounds3<T>::IntersectP(const Ray &ray, const Vector3f &invDir,const 
 	return (tMin < ray.tMax) && (tMax > 0);
 }
 
-
 inline Point3f OffsetRayOrigin(const Point3f &p, const Normal3f &n, const Vector3f &w) {
 	Float d = Dot(Abs(n), Vector3f(1e-4, 1e-4, 1e-4));
 	Vector3f offset = d * Vector3f(n);
 	if (Dot(w, n) < 0)
 		offset = -offset;
 	Point3f po = p + offset;
-	//<< Round offset point po away from p >>
-	//Point3f po = p;
-		return po;
+	return po;
 }
 
 inline Vector3f SphericalDirection(Float sinTheta, Float cosTheta, Float phi) {
-	return Vector3f(sinTheta * std::cos(phi), sinTheta * std::sin(phi),
-		cosTheta);
+	return Vector3f(sinTheta * std::cos(phi), sinTheta * std::sin(phi),cosTheta);
 }
 
 inline Vector3f SphericalDirection(Float sinTheta, Float cosTheta, Float phi,
 	const Vector3f &x, const Vector3f &y,
 	const Vector3f &z) {
-	return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y +
-		cosTheta * z;
+	return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y +cosTheta * z;
 }
 
 inline Float SphericalTheta(const Vector3f &v) {

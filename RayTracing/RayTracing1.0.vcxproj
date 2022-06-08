@@ -77,10 +77,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Assimp\include;C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\external;C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files (x86)\Assimp\include;C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\external;C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Assimp\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <ReferencePath>C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\include;$(ReferencePath)</ReferencePath>
+    <ReferencePath>C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -88,10 +88,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Assimp\include;C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\external;C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files (x86)\Assimp\include;C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\external;C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Assimp\lib;$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <ReferencePath>C:\Users\刘文涛广丰\source\repos\RayTracing - 副本\RayTracing\include;$(ReferencePath)</ReferencePath>
+    <ReferencePath>C:\Users\刘文涛广丰\source\repos\PathTracing\RayTracing\include;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

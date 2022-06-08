@@ -2,8 +2,6 @@
 #include "sampling.h"
 
 void StratifiedSampler::StartPixel(const Point2i &p) {
-	//ProfilePhase _(Prof::StartPixel);
-	// Generate single stratified samples for the pixel
 	for (size_t i = 0; i < samples1D.size(); ++i) {
 		StratifiedSample1D(&samples1D[i][0], xPixelSamples * yPixelSamples, rng,
 			jitterSamples);
@@ -15,7 +13,6 @@ void StratifiedSampler::StartPixel(const Point2i &p) {
 		Shuffle(&samples2D[i][0], xPixelSamples * yPixelSamples, 1, rng);
 	}
 
-	// Generate arrays of stratified samples for the pixel
 	for (size_t i = 0; i < samples1DArraySizes.size(); ++i)
 		for (int64_t j = 0; j < samplesPerPixel; ++j) {
 			int count = samples1DArraySizes[i];
@@ -38,11 +35,6 @@ std::unique_ptr<Sampler> StratifiedSampler::Clone(int seed) {
 }
 
 StratifiedSampler *CreateStratifiedSampler() {
-	//bool jitter = params.FindOneBool("jitter", true);
-	//int xsamp = params.FindOneInt("xsamples", 4);
-	//int ysamp = params.FindOneInt("ysamples", 4);
-	//int sd = params.FindOneInt("dimensions", 4);
-	//if (PbrtOptions.quickRender) xsamp = ysamp = 1;
 	bool jitter = true;
 	int xsamp = 1;
 	int ysamp = 1;

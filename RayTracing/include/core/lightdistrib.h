@@ -9,9 +9,6 @@
 class LightDistribution {
 public:
 	virtual ~LightDistribution();
-
-	// Given a point |p| in space, this method returns a (hopefully
-	// effective) sampling distribution for light sources at that point.
 	virtual const Distribution1D *Lookup(const Point3f &p) const = 0;
 };
 

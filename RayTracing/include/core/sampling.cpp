@@ -23,16 +23,13 @@ void StratifiedSample2D(Point2f *samp, int nx, int ny, RNG &rng, bool jitter) {
 }
 
 void LatinHypercube(Float *samples, int nSamples, int nDim, RNG &rng) {
-	// Generate LHS samples along diagonal
 	Float invNSamples = (Float)1 / nSamples;
 	for (int i = 0; i < nSamples; ++i)
 		for (int j = 0; j < nDim; ++j) {
 			Float sj = (i + (rng.UniformFloat())) * invNSamples;
 			samples[nDim * i + j] = std::min(sj, OneMinusEpsilon);
 		}
-
-	// Permute LHS samples in each dimension
-	for (int i = 0; i < nDim; ++i) {
+		for (int i = 0; i < nDim; ++i) {
 		for (int j = 0; j < nSamples; ++j) {
 			int other = j + rng.UniformUInt32(nSamples - j);
 			std::swap(samples[nDim * j + i], samples[nDim * other + i]);
@@ -74,13 +71,8 @@ Point2f UniformSampleDisk(const Point2f &u) {
 }
 
 Point2f ConcentricSampleDisk(const Point2f &u) {
-	// Map uniform random numbers to [-1,1]
 	Point2f uOffset = 2.f * u - Vector2f(1, 1);
-
-	// Handle degeneracy at the origin
 	if (uOffset.x == 0 && uOffset.y == 0) return Point2f(0, 0);
-
-	// Apply concentric mapping to point
 	Float theta, r;
 	if (std::abs(uOffset.x) > std::abs(uOffset.y)) {
 		r = uOffset.x;
@@ -101,8 +93,7 @@ Vector3f UniformSampleCone(const Point2f &u, Float cosThetaMax) {
 	Float cosTheta = ((Float)1 - u[0]) + u[0] * cosThetaMax;
 	Float sinTheta = std::sqrt((Float)1 - cosTheta * cosTheta);
 	Float phi = u[1] * 2 * Pi;
-	return Vector3f(std::cos(phi) * sinTheta, std::sin(phi) * sinTheta,
-		cosTheta);
+	return Vector3f(std::cos(phi) * sinTheta, std::sin(phi) * sinTheta,cosTheta);
 }
 
 Vector3f UniformSampleCone(const Point2f &u, Float cosThetaMax,
@@ -111,8 +102,7 @@ Vector3f UniformSampleCone(const Point2f &u, Float cosThetaMax,
 	Float cosTheta = Lerp(u[0], cosThetaMax, 1.f);
 	Float sinTheta = std::sqrt((Float)1. - cosTheta * cosTheta);
 	Float phi = u[1] * 2 * Pi;
-	return std::cos(phi) * sinTheta * x + std::sin(phi) * sinTheta * y +
-		cosTheta * z;
+	return std::cos(phi) * sinTheta * x + std::sin(phi) * sinTheta * y +cosTheta * z;
 }
 
 Point2f UniformSampleTriangle(const Point2f &u) {
@@ -123,10 +113,8 @@ Point2f UniformSampleTriangle(const Point2f &u) {
 Distribution2D::Distribution2D(const Float *func, int nu, int nv) {
 	pConditionalV.reserve(nv);
 	for (int v = 0; v < nv; ++v) {
-		// Compute conditional sampling distribution for v
 		pConditionalV.emplace_back(new Distribution1D(&func[v * nu], nu));
 	}
-	// Compute marginal sampling distribution p[v]
 	std::vector<Float> marginalFunc;
 	marginalFunc.reserve(nv);
 	for (int v = 0; v < nv; ++v)

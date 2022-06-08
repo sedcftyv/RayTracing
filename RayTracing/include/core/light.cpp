@@ -34,16 +34,7 @@ DiffuseAreaLight::DiffuseAreaLight(const Transform &LightToWorld,
 	shape(shape),
 	twoSided(twoSided),
 	area(shape->Area()) {
-	// Warn if light has transformation with non-uniform scale, though not
-	// for Triangles, since this doesn't matter for them.
-	//if (WorldToLight.HasScale() &&
-	//	dynamic_cast<const Triangle *>(shape.get()) == nullptr)
-	//	Warning(
-	//		"Scaling detected in world to light transformation! "
-	//		"The system has numerous assumptions, implicit and explicit, "
-	//		"that this transform will have no scale factors in it. "
-	//		"Proceed at your own risk; your image may have errors.");
-}
+									}
 
 Spectrum DiffuseAreaLight::Power() const {
 	return (twoSided ? 2 : 1) * Lemit * area * Pi;
@@ -52,12 +43,10 @@ Spectrum DiffuseAreaLight::Power() const {
 Spectrum DiffuseAreaLight::Sample_Li(const Interaction &ref, const Point2f &u,
 	Vector3f *wi, Float *pdf,
 	VisibilityTester *vis) const {
-	//ProfilePhase _(Prof::LightSample);
 	Interaction pShape = shape->Sample(ref, u, pdf);
-	//pShape.mediumInterface = mediumInterface;
 	if (*pdf == 0 || (pShape.p - ref.p).LengthSquared() == 0) {
-		*pdf = 0;
-		return 0.f;
+	*pdf = 0;
+	return 0.f;
 	}
 	*wi = Normalize(pShape.p - ref.p);
 	*vis = VisibilityTester(ref, pShape);
@@ -66,25 +55,18 @@ Spectrum DiffuseAreaLight::Sample_Li(const Interaction &ref, const Point2f &u,
 
 Float DiffuseAreaLight::Pdf_Li(const Interaction &ref,
 	const Vector3f &wi) const {
-	//ProfilePhase _(Prof::LightPdf);
 	return shape->Pdf(ref, wi);
 }
 
 Spectrum DiffuseAreaLight::Sample_Le(const Point2f &u1, const Point2f &u2,
 	Float time, Ray *ray, Normal3f *nLight,
 	Float *pdfPos, Float *pdfDir) const {
-	//ProfilePhase _(Prof::LightSample);
-	// Sample a point on the area light's _Shape_, _pShape_
 	Interaction pShape = shape->Sample(u1, pdfPos);
-	//pShape.mediumInterface = mediumInterface;
 	*nLight = pShape.n;
 
-	// Sample a cosine-weighted outgoing direction _w_ for area light
 	Vector3f w;
 	if (twoSided) {
 		Point2f u = u2;
-		// Choose a side to sample and then remap u[0] to [0,1] before
-		// applying cosine-weighted hemisphere sampling for the chosen side.
 		if (u[0] < .5) {
 			u[0] = std::min(u[0] * 2, OneMinusEpsilon);
 			w = CosineSampleHemisphere(u);
@@ -110,10 +92,8 @@ Spectrum DiffuseAreaLight::Sample_Le(const Point2f &u1, const Point2f &u2,
 
 void DiffuseAreaLight::Pdf_Le(const Ray &ray, const Normal3f &n, Float *pdfPos,
 	Float *pdfDir) const {
-	//ProfilePhase _(Prof::LightPdf);
 	Interaction it(ray.o, n,  Vector3f(n), ray.time);
 	*pdfPos = shape->Pdf(it);
-	*pdfDir = twoSided ? (.5 * CosineHemispherePdf(AbsDot(n, ray.d)))
-		: CosineHemispherePdf(Dot(n, ray.d));
+	*pdfDir = twoSided ? (.5 * CosineHemispherePdf(AbsDot(n, ray.d))): CosineHemispherePdf(Dot(n, ray.d));
 }
 

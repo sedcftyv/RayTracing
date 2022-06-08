@@ -6,16 +6,10 @@ static long long primitiveMemory = 0;
 Primitive::~Primitive() {}
 
 const AreaLight *Aggregate::GetAreaLight() const {
-	//LOG(FATAL) <<
-	//	"Aggregate::GetAreaLight() method"
-	//	"called; should have gone to GeometricPrimitive";
 	return nullptr;
 }
 
 const Material *Aggregate::GetMaterial() const {
-	//LOG(FATAL) <<
-	//	"Aggregate::GetMaterial() method"
-	//	"called; should have gone to GeometricPrimitive";
 	return nullptr;
 }
 
@@ -43,20 +37,41 @@ bool GeometricPrimitive::Intersect(const Ray &r,
 	Float tHit;
 	if (!shape->Intersect(r, &tHit, isect)) return false;
 	r.tMax = tHit;
-	//std::cout << r.tMax << std::endl;
 	isect->primitive = this;
-	//CHECK_GE(Dot(isect->n, isect->shading.n), 0.);
-	//// Initialize _SurfaceInteraction::mediumInterface_ after _Shape_
-	//// intersection
-	//if (mediumInterface.IsMediumTransition())
-	//	isect->mediumInterface = mediumInterface;
-	//else
-	//	isect->mediumInterface = MediumInterface(r.medium);
 	return true;
 }
 
 void GeometricPrimitive::ComputeScatteringFunctions(SurfaceInteraction *isect, TransportMode mode,bool allowMultipleLobes) const {
 	if (material)
 		material->ComputeScatteringFunctions(isect, mode,allowMultipleLobes);
-	CHECK_GE(Dot(isect->n, isect->shading.n), 0.);
+}
+
+SimpleAccel::SimpleAccel(std::vector<std::shared_ptr<Primitive>> p) {
+	if (p.empty()) return;
+	primitives = p;
+	for (int i = 0; i < primitives.size(); ++i)
+	{
+		bound=Union(primitives[i]->WorldBound(),bound);
+	}
+}
+
+SimpleAccel::~SimpleAccel() {
+}
+
+Bounds3f SimpleAccel::WorldBound() const{
+	return bound;
+}
+bool SimpleAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
+	bool hit = false;
+	for (int i = 0; i <primitives.size(); ++i)
+		if (primitives[i]->Intersect(ray, isect))
+			hit = true;
+	return hit;
+}
+
+bool SimpleAccel::IntersectP(const Ray &ray) const {
+	for (int i = 0; i < primitives.size(); ++i)
+		if (primitives[i]->IntersectP(ray))
+			return true;
+	return false;
 }

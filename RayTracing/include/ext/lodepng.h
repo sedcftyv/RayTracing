@@ -919,14 +919,10 @@ LodePNG is a PNG codec according to the Portable Network Graphics (PNG)
 Specification (Second Edition) - W3C Recommendation 10 November 2003.
 The specifications used are:
 *) Portable Network Graphics (PNG) Specification (Second Edition):
-	 http://www.w3.org/TR/2003/REC-PNG-20031110
-*) RFC 1950 ZLIB Compressed Data Format version 3.3:
-	 http://www.gzip.org/zlib/rfc-zlib.html
-*) RFC 1951 DEFLATE Compressed Data Format Specification ver 1.3:
-	 http://www.gzip.org/zlib/rfc-deflate.html
-The most recent version of LodePNG can currently be found at
-http://lodev.org/lodepng/
-LodePNG works both in C (ISO C90) and C++, with a C++ wrapper that adds
+	 http:*) RFC 1950 ZLIB Compressed Data Format version 3.3:
+	 http:*) RFC 1951 DEFLATE Compressed Data Format Specification ver 1.3:
+	 http:The most recent version of LodePNG can currently be found at
+http:LodePNG works both in C (ISO C90) and C++, with a C++ wrapper that adds
 extra functionality.
 LodePNG exists out of two files:
 -lodepng.h: the header file for both C and C++
@@ -1355,14 +1351,11 @@ examples can be found on the LodePNG website.
 int main(int argc, char *argv[])
 {
   const char* filename = argc > 1 ? argv[1] : "test.png";
-  //load and decode
-  std::vector<unsigned char> image;
+    std::vector<unsigned char> image;
   unsigned width, height;
   unsigned error = lodepng::decode(image, width, height, filename);
-  //if there's an error, display it
-  if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
-  //the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
-}
+    if(error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+  }
 10.2. decoder C example
 -----------------------
 #include "lodepng.h"
